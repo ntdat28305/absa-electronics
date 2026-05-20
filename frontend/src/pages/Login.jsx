@@ -27,7 +27,10 @@ export default function Login() {
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <span className="text-3xl font-extrabold text-blue-500">⚡ DevSense</span>
+          <div className="flex items-center justify-center gap-2">
+            <img src="/logo.jpg" alt="logo" className="w-10 h-10 object-contain" />
+            <span className="text-3xl font-extrabold text-blue-500">G5</span>
+          </div>
           <p className="text-gray-500 text-sm mt-1">Đăng nhập để lưu ưu thích & lịch sử</p>
         </div>
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
