@@ -5,6 +5,7 @@ import DeviceCard from "../components/DeviceCard";
 import { useAuth } from "../context/AuthContext";
 
 const BRANDS = ["Apple", "Samsung", "ASUS", "Dell", "Xiaomi", "Oppo", "Vivo"];
+const PAGE_SIZE = 20;
 
 export default function Home() {
   const { user } = useAuth();
@@ -16,27 +17,41 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [favorites, setFavorites] = useState(new Set());
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const fetchFavs = async () => {
     if (!user) return;
     try {
       const r = await getFavorites();
       setFavorites(new Set(r.data.map(d => d.id)));
-    } catch {}
-  };
-
-  const fetchDevices = async () => {
-    setLoading(true);
-    try {
-      const r = await listDevices({ category: category || undefined, brand: brand || undefined, sort, page });
-      setDevices(r.data.items);
-      setTotal(r.data.total);
-    } finally {
-      setLoading(false);
+    } catch (e) {
+      console.error("Failed to load favorites:", e);
     }
   };
 
-  useEffect(() => { fetchDevices(); }, [category, brand, sort, page]);
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError("");
+    listDevices({ category: category || undefined, brand: brand || undefined, sort, page })
+      .then(r => {
+        if (!cancelled) {
+          setDevices(r.data.items);
+          setTotal(r.data.total);
+        }
+      })
+      .catch(e => {
+        if (!cancelled) {
+          console.error("Failed to load devices:", e);
+          setError("Không thể tải danh sách thiết bị. Vui lòng thử lại.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [category, brand, sort, page]);
+
   useEffect(() => { fetchFavs(); }, [user]);
 
   return (
@@ -63,7 +78,9 @@ export default function Home() {
         {/* Main */}
         <div className="flex-1">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-lg font-bold">Kho thiết bị <span className="text-gray-500 text-sm font-normal">({total} thiết bị)</span></h1>
+            <h1 className="text-lg font-bold">
+              Kho thiết bị{!loading && <span className="text-gray-500 text-sm font-normal"> ({total} thiết bị)</span>}
+            </h1>
             <select value={sort} onChange={e => setSort(e.target.value)}
               className="bg-gray-800 border border-gray-700 text-sm rounded px-2 py-1 text-gray-300">
               <option value="score">Điểm cao nhất</option>
@@ -72,6 +89,8 @@ export default function Home() {
           </div>
           {loading ? (
             <div className="text-center py-20 text-gray-500">Đang tải...</div>
+          ) : error ? (
+            <div className="text-center py-20 text-red-400">{error}</div>
           ) : devices.length === 0 ? (
             <div className="text-center py-20 text-gray-500">Chưa có thiết bị nào trong kho</div>
           ) : (
@@ -82,11 +101,11 @@ export default function Home() {
             </div>
           )}
           {/* Pagination */}
-          {total > 20 && (
+          {total > PAGE_SIZE && (
             <div className="flex gap-2 justify-center mt-6">
               {page > 1 && <button onClick={() => setPage(p => p - 1)} className="px-3 py-1 bg-gray-800 rounded text-sm">← Trước</button>}
               <span className="px-3 py-1 text-sm text-gray-400">Trang {page}</span>
-              {page * 20 < total && <button onClick={() => setPage(p => p + 1)} className="px-3 py-1 bg-gray-800 rounded text-sm">Tiếp →</button>}
+              {page * PAGE_SIZE < total && <button onClick={() => setPage(p => p + 1)} className="px-3 py-1 bg-gray-800 rounded text-sm">Tiếp →</button>}
             </div>
           )}
         </div>
