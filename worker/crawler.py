@@ -1,0 +1,160 @@
+import requests
+import time
+
+
+def get_headers(referer: str) -> dict:
+    return {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Referer": referer,
+    }
+
+
+# ─── Shopee Search API ─────────────────────────────────────────────────────────
+
+def search_shopee(query: str, num_links: int) -> list[dict]:
+    url = "https://shopee.vn/api/v4/search/search_items"
+    params = {
+        "by": "relevancy",
+        "keyword": query,
+        "limit": num_links,
+        "order": "desc",
+        "page_type": "search",
+    }
+    try:
+        r = requests.get(url, params=params, headers=get_headers("https://shopee.vn/"), timeout=15)
+        r.raise_for_status()
+        items = r.json().get("items", [])[:num_links]
+    except Exception as e:
+        print(f"[Shopee search error] {e}")
+        return []
+
+    results = []
+    for item in items:
+        d = item.get("item_basic", {})
+        shop_id = d.get("shopid")
+        item_id = d.get("itemid")
+        if not shop_id or not item_id:
+            continue
+        price_raw = d.get("price", 0)
+        price = f"{int(price_raw / 100000) / 10:.1f}M đ" if price_raw else ""
+        results.append({
+            "name": d.get("name", ""),
+            "image_url": f"https://cf.shopee.vn/file/{d.get('image', '')}",
+            "price": price,
+            "product_url": f"https://shopee.vn/product/{shop_id}/{item_id}",
+            "platform": "shopee",
+            "shop_id": shop_id,
+            "item_id": item_id,
+        })
+    return results
+
+
+# ─── Tiki Search API ───────────────────────────────────────────────────────────
+
+def search_tiki(query: str, num_links: int) -> list[dict]:
+    url = "https://tiki.vn/api/v2/products"
+    params = {"q": query, "limit": num_links, "sort": "top_seller"}
+    try:
+        r = requests.get(url, params=params, headers=get_headers("https://tiki.vn/"), timeout=15)
+        r.raise_for_status()
+        items = r.json().get("data", [])[:num_links]
+    except Exception as e:
+        print(f"[Tiki search error] {e}")
+        return []
+
+    results = []
+    for item in items:
+        product_id = item.get("id")
+        seller_id = item.get("seller_id", 1)
+        if not product_id:
+            continue
+        results.append({
+            "name": item.get("name", ""),
+            "image_url": item.get("thumbnail_url", ""),
+            "price": f"{item.get('price', 0):,}đ",
+            "product_url": f"https://tiki.vn/{item.get('url_path', '')}",
+            "platform": "tiki",
+            "product_id": product_id,
+            "seller_id": seller_id,
+        })
+    return results
+
+
+# ─── Shopee Reviews ────────────────────────────────────────────────────────────
+
+def scrape_shopee_reviews(shop_id: int, item_id: int, count: int) -> list[str]:
+    reviews = []
+    page = 0
+    while len(reviews) < count:
+        url = (
+            f"https://shopee.vn/api/v2/item/get_ratings"
+            f"?itemid={item_id}&shopid={shop_id}&limit=20&offset={page * 20}&type=0"
+        )
+        try:
+            r = requests.get(
+                url,
+                headers=get_headers(f"https://shopee.vn/product/{shop_id}/{item_id}"),
+                timeout=10,
+            )
+            r.raise_for_status()
+            ratings = r.json().get("data", {}).get("ratings", [])
+            if not ratings:
+                break
+            for rating in ratings:
+                comment = (rating.get("comment") or "").strip()
+                if comment:
+                    reviews.append(comment)
+            page += 1
+            time.sleep(0.5)
+        except Exception as e:
+            print(f"[Shopee reviews error page={page}] {e}")
+            break
+    seen = set()
+    unique = []
+    for r in reviews:
+        if r not in seen:
+            seen.add(r)
+            unique.append(r)
+    return unique[:count]
+
+
+# ─── Tiki Reviews ─────────────────────────────────────────────────────────────
+
+def scrape_tiki_reviews(product_id: int, seller_id: int, count: int) -> list[str]:
+    reviews = []
+    page = 1
+    while len(reviews) < count:
+        url = f"https://tiki.vn/api/v2/reviews?product_id={product_id}&seller_id={seller_id}&page={page}&limit=20"
+        try:
+            r = requests.get(url, headers=get_headers("https://tiki.vn/"), timeout=10)
+            r.raise_for_status()
+            data = r.json().get("data", [])
+            if not data:
+                break
+            for item in data:
+                content = (item.get("content") or "").strip()
+                if content:
+                    reviews.append(content)
+            page += 1
+            time.sleep(0.5)
+        except Exception as e:
+            print(f"[Tiki reviews error page={page}] {e}")
+            break
+    seen = set()
+    unique = []
+    for r in reviews:
+        if r not in seen:
+            seen.add(r)
+            unique.append(r)
+    return unique[:count]
+
+
+# ─── Unified crawl ────────────────────────────────────────────────────────────
+
+def crawl_product(product_info: dict, count: int) -> list[str]:
+    platform = product_info.get("platform")
+    if platform == "shopee":
+        return scrape_shopee_reviews(product_info["shop_id"], product_info["item_id"], count)
+    if platform == "tiki":
+        return scrape_tiki_reviews(product_info["product_id"], product_info["seller_id"], count)
+    return []
