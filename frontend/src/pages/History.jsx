@@ -12,6 +12,7 @@ export default function History() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/login");
@@ -20,9 +21,10 @@ export default function History() {
   useEffect(() => {
     if (!user) return;
     setLoading(true);
+    setError("");
     getHistory(page)
       .then(r => { setItems(r.data.items); setTotal(r.data.total); })
-      .catch(console.error)
+      .catch(() => setError("Không thể tải lịch sử. Vui lòng thử lại."))
       .finally(() => setLoading(false));
   }, [user, page]);
 
@@ -31,6 +33,8 @@ export default function History() {
       <h1 className="text-xl font-bold mb-6">Lịch sử phân tích ({total})</h1>
       {loading ? (
         <p className="text-gray-500 text-center py-12">Đang tải...</p>
+      ) : error ? (
+        <p className="text-red-400 text-center py-12">{error}</p>
       ) : items.length === 0 ? (
         <p className="text-gray-500 text-center py-12">Chưa có lịch sử</p>
       ) : (

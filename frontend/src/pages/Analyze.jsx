@@ -50,7 +50,7 @@ export default function Analyze() {
           <label className="text-xs text-gray-400 shrink-0">Số reviews cần cào:</label>
           <input
             type="number" min={10} max={200} value={count}
-            onChange={e => setCount(parseInt(e.target.value) || 10)}
+            onChange={e => setCount(Math.min(200, Math.max(10, parseInt(e.target.value) || 10)))}
             className="w-24 bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-sm"
           />
         </div>

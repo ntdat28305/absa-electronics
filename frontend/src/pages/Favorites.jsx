@@ -9,6 +9,7 @@ export default function Favorites() {
   const navigate = useNavigate();
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/login");
@@ -17,19 +18,24 @@ export default function Favorites() {
   const fetchFavs = () => {
     if (!user) return;
     setLoading(true);
+    setError("");
     getFavorites()
       .then(r => setDevices(r.data))
-      .catch(console.error)
+      .catch(() => setError("Không thể tải ưu thích. Vui lòng thử lại."))
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchFavs(); }, [user]);
+  useEffect(() => {
+    if (user) fetchFavs();
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       <h1 className="text-xl font-bold mb-6">Thiết bị yêu thích ({devices.length})</h1>
       {loading ? (
         <p className="text-gray-500 text-center py-12">Đang tải...</p>
+      ) : error ? (
+        <p className="text-red-400 text-center py-12">{error}</p>
       ) : devices.length === 0 ? (
         <p className="text-gray-500 text-center py-12">Chưa có thiết bị nào</p>
       ) : (
