@@ -46,19 +46,13 @@ def _get_shopee_proxy() -> dict | None:
 # ─── Shopee Search API ─────────────────────────────────────────────────────────
 
 def search_shopee(query: str, num_links: int, min_reviews: int = 10) -> list[dict]:
+    """Try direct requests first; returns [] if blocked (use search_and_crawl_shopee instead)."""
     url = "https://shopee.vn/api/v4/search/search_items"
-    params = {
-        "by": "relevancy",
-        "keyword": query,
-        "limit": num_links * 3,
-        "order": "desc",
-        "page_type": "search",
-    }
+    params = {"by": "relevancy", "keyword": query, "limit": num_links * 3,
+              "order": "desc", "page_type": "search"}
     try:
-        r = requests.get(
-            url, params=params, headers=get_headers("https://shopee.vn/"),
-            proxies=_get_shopee_proxy(), timeout=15,
-        )
+        r = requests.get(url, params=params, headers=get_headers("https://shopee.vn/"),
+                         proxies=_get_shopee_proxy(), timeout=15)
         r.raise_for_status()
         items = r.json().get("items", [])
     except Exception as e:
@@ -87,6 +81,163 @@ def search_shopee(query: str, num_links: int, min_reviews: int = 10) -> list[dic
         })
         if len(results) >= num_links:
             break
+    return results
+
+
+def _make_uc_driver():
+    import undetected_chromedriver as uc
+    opts = uc.ChromeOptions()
+    opts.add_argument("--no-sandbox")
+    opts.add_argument("--window-size=1920,1080")
+    opts.add_argument("--lang=vi-VN")
+    driver = uc.Chrome(options=opts, headless=False)
+    driver.set_page_load_timeout(45)
+    driver.set_script_timeout(30)
+    return driver
+
+
+def _inject_shopee_cookies(driver):
+    shopee_cookie = os.getenv("SHOPEE_COOKIE", "")
+    if not shopee_cookie:
+        return
+    for part in shopee_cookie.split(";"):
+        name, _, value = part.strip().partition("=")
+        name = name.strip()
+        if not name:
+            continue
+        try:
+            driver.add_cookie({"name": name, "value": value.strip(),
+                               "domain": ".shopee.vn", "path": "/"})
+        except Exception:
+            pass
+
+
+def search_and_crawl_shopee(query: str, num_links: int, reviews_per_product: int) -> list[dict]:
+    """Open one browser session: search products then crawl reviews for each."""
+    try:
+        import undetected_chromedriver as uc
+    except ImportError:
+        print("[Shopee] undetected_chromedriver not installed")
+        return []
+
+    from urllib.parse import quote
+    driver = None
+    results = []
+
+    try:
+        driver = _make_uc_driver()
+
+        # Load homepage and inject cookies
+        driver.get("https://shopee.vn")
+        time.sleep(3)
+        _inject_shopee_cookies(driver)
+        driver.get("https://shopee.vn")
+        time.sleep(2)
+
+        # Search via browser fetch
+        encoded = quote(query)
+        search_result = driver.execute_async_script(f"""
+            const done = arguments[0];
+            fetch('/api/v4/search/search_items?by=relevancy&keyword={encoded}&limit={num_links * 3}&order=desc&page_type=search', {{
+                credentials: 'include',
+                headers: {{'x-requested-with': 'XMLHttpRequest'}}
+            }})
+            .then(r => r.json())
+            .then(data => done(data))
+            .catch(() => done(null));
+        """)
+
+        items = (search_result or {}).get("items", [])
+        print(f"[search_and_crawl_shopee] found {len(items)} raw items for '{query}'")
+
+        products = []
+        for item in items:
+            d = item.get("item_basic", {})
+            shop_id = d.get("shopid")
+            item_id = d.get("itemid")
+            if not shop_id or not item_id:
+                continue
+            price_raw = d.get("price", 0)
+            price = f"{int(price_raw / 100000) / 10:.1f}M đ" if price_raw else ""
+            products.append({
+                "name": d.get("name", ""),
+                "image_url": f"https://cf.shopee.vn/file/{d.get('image', '')}",
+                "price": price,
+                "product_url": f"https://shopee.vn/product/{shop_id}/{item_id}",
+                "platform": "shopee",
+                "shop_id": shop_id,
+                "item_id": item_id,
+                "reviews": [],
+            })
+            if len(products) >= num_links:
+                break
+
+        # For each product, navigate and crawl reviews in the same browser session
+        for p in products:
+            shop_id = p["shop_id"]
+            item_id = p["item_id"]
+            driver.get(f"https://shopee.vn/product/{shop_id}/{item_id}")
+            time.sleep(5)
+
+            # Update image and name from og tags
+            try:
+                img = driver.execute_script(
+                    "const m=document.querySelector('meta[property=\"og:image\"]'); return m?m.content:'';"
+                ) or ""
+                title = driver.execute_script(
+                    "const m=document.querySelector('meta[property=\"og:title\"]'); return m?m.content:'';"
+                ) or ""
+                if img:
+                    p["image_url"] = img
+                if title:
+                    p["name"] = title
+            except Exception:
+                pass
+
+            reviews = []
+            pg = 0
+            while len(reviews) < reviews_per_product:
+                offset = pg * 20
+                try:
+                    data = driver.execute_async_script(f"""
+                        const done = arguments[0];
+                        fetch('/api/v2/item/get_ratings?itemid={item_id}&shopid={shop_id}&limit=20&offset={offset}&type=0', {{
+                            credentials: 'include',
+                            headers: {{'x-requested-with': 'XMLHttpRequest'}}
+                        }})
+                        .then(r => r.json())
+                        .then(d => done(d))
+                        .catch(() => done(null));
+                    """)
+                except Exception as e:
+                    print(f"[Shopee reviews page={pg}] {e}")
+                    break
+                ratings = (data or {}).get("data", {}).get("ratings", [])
+                if not ratings:
+                    break
+                for rating in ratings:
+                    comment = (rating.get("comment") or "").strip()
+                    if comment:
+                        reviews.append(comment)
+                print(f"[Shopee] {p['name'][:30]} — {len(reviews)} reviews (page {pg})")
+                pg += 1
+                time.sleep(random.uniform(1.0, 2.0))
+
+            p["reviews"] = reviews
+            if reviews:
+                results.append(p)
+            else:
+                print(f"[skip] no reviews for {p['name'][:40]}")
+
+    except Exception as e:
+        print(f"[search_and_crawl_shopee error] {e}")
+    finally:
+        if driver:
+            try:
+                driver.quit()
+            except Exception:
+                pass
+
     return results
 
 

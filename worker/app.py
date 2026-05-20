@@ -4,7 +4,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 
-from crawler import search_shopee, search_tiki, crawl_product, get_tiki_product, get_shopee_product
+from crawler import search_shopee, search_tiki, crawl_product, get_tiki_product, get_shopee_product, search_and_crawl_shopee
 from inferencer import analyze_reviews
 from scoring import compute_aspect_scores, compute_overall_score
 
@@ -57,40 +57,55 @@ def health():
 @app.post("/crawl/search")
 def crawl_search(data: SearchRequest, x_worker_key: str = Header(...)):
     check_key(x_worker_key)
-    products = []
-    if data.platform in ("shopee", "both"):
-        found = search_shopee(data.query, data.num_links)
-        print(f"[search_shopee] found {len(found)} products for '{data.query}'")
-        products += found
-    if data.platform in ("tiki", "both"):
-        products += search_tiki(data.query, data.num_links)
-
-    if not products:
-        return {"devices": []}
-
     devices = []
-    for p in products[: data.num_links]:
-        texts = crawl_product(p, data.reviews_per_link)
-        if not texts:
-            print(f"[skip] no reviews for {p.get('name', '')}")
-            continue
-        aspects_list = analyze_reviews(texts)
-        aspect_scores = compute_aspect_scores(aspects_list)
-        overall_score = compute_overall_score(aspect_scores, len(texts))
-        devices.append(
-            {
+
+    # Shopee: dùng 1 browser session cho cả search + crawl reviews
+    if data.platform in ("shopee", "both"):
+        shopee_products = search_and_crawl_shopee(data.query, data.num_links, data.reviews_per_link)
+        for p in shopee_products:
+            texts = p.get("reviews", [])
+            if not texts:
+                continue
+            aspects_list = analyze_reviews(texts)
+            aspect_scores = compute_aspect_scores(aspects_list)
+            overall_score = compute_overall_score(aspect_scores, len(texts))
+            devices.append({
                 "name": p["name"],
                 "category": infer_category(p["name"]),
                 "brand": infer_brand(p["name"]),
-                "image_url": p.get("image_url"),
-                "platform": p["platform"],
+                "image_url": p.get("image_url", ""),
+                "platform": "shopee",
                 "product_url": p["product_url"],
-                "price": p.get("price"),
+                "price": p.get("price", ""),
                 "aspect_scores": aspect_scores,
                 "overall_score": overall_score,
                 "reviews": [{"text": t, "aspects": a} for t, a in zip(texts, aspects_list)],
-            }
-        )
+            })
+
+    # Tiki: dùng requests API như cũ
+    if data.platform in ("tiki", "both"):
+        tiki_products = search_tiki(data.query, data.num_links)
+        for p in tiki_products[: data.num_links]:
+            texts = crawl_product(p, data.reviews_per_link)
+            if not texts:
+                print(f"[skip] no reviews for {p.get('name', '')}")
+                continue
+            aspects_list = analyze_reviews(texts)
+            aspect_scores = compute_aspect_scores(aspects_list)
+            overall_score = compute_overall_score(aspect_scores, len(texts))
+            devices.append({
+                "name": p["name"],
+                "category": infer_category(p["name"]),
+                "brand": infer_brand(p["name"]),
+                "image_url": p.get("image_url", ""),
+                "platform": "tiki",
+                "product_url": p["product_url"],
+                "price": p.get("price", ""),
+                "aspect_scores": aspect_scores,
+                "overall_score": overall_score,
+                "reviews": [{"text": t, "aspects": a} for t, a in zip(texts, aspects_list)],
+            })
+
     return {"devices": devices}
 
 
