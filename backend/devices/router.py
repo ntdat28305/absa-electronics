@@ -18,6 +18,20 @@ def get_devices(category: Optional[str] = None, brand: Optional[str] = None,
 def search(q: str = Query(..., min_length=1), db: Session = Depends(get_db)):
     return [DeviceOut.model_validate(d) for d in search_devices(db, q)]
 
+@router.delete("/{device_id}", response_model=dict)
+def delete_device(device_id: int, x_worker_key: str = Header(...),
+                  db: Session = Depends(get_db)):
+    if x_worker_key != settings.worker_api_key:
+        raise HTTPException(status_code=403, detail="Invalid worker API key")
+    from models import Review, Device
+    device = db.query(Device).filter(Device.id == device_id).first()
+    if not device:
+        raise HTTPException(status_code=404, detail="Không tìm thấy thiết bị")
+    db.query(Review).filter(Review.device_id == device_id).delete()
+    db.delete(device)
+    db.commit()
+    return {"deleted": device_id}
+
 @router.get("/{device_id}", response_model=DeviceDetail)
 def get_one(device_id: int, db: Session = Depends(get_db)):
     device, reviews = get_device(db, device_id)
