@@ -189,10 +189,10 @@ def scrape_shopee_reviews(shop_id: int, item_id: int, count: int) -> list[str]:
         opts.add_argument("--no-sandbox")
         opts.add_argument("--window-size=1920,1080")
         opts.add_argument("--lang=vi-VN")
-        opts.add_argument("--disable-blink-features=AutomationControlled")
 
-        driver = uc.Chrome(options=opts, headless=True)
+        driver = uc.Chrome(options=opts, headless=False)
         driver.set_page_load_timeout(45)
+        driver.set_script_timeout(30)
 
         # Load shopee.vn first to set domain for cookies
         driver.get("https://shopee.vn")
