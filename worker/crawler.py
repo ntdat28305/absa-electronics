@@ -17,7 +17,7 @@ def get_headers(referer: str) -> dict:
 
 # ─── Shopee Search API ─────────────────────────────────────────────────────────
 
-def search_shopee(query: str, num_links: int, min_reviews: int = 0) -> list[dict]:
+def search_shopee(query: str, num_links: int, min_reviews: int = 10) -> list[dict]:
     url = "https://shopee.vn/api/v4/search/search_items"
     params = {
         "by": "relevancy",
@@ -61,7 +61,7 @@ def search_shopee(query: str, num_links: int, min_reviews: int = 0) -> list[dict
 
 # ─── Tiki Search API ───────────────────────────────────────────────────────────
 
-def search_tiki(query: str, num_links: int, min_reviews: int = 0) -> list[dict]:
+def search_tiki(query: str, num_links: int, min_reviews: int = 10) -> list[dict]:
     url = "https://tiki.vn/api/v2/products"
     params = {"q": query, "limit": num_links * 3, "sort": "top_seller"}
     try:
