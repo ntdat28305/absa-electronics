@@ -39,8 +39,14 @@ export default function DeviceDetail() {
 
   const toggleFav = async () => {
     if (!user) return alert("Vui lòng đăng nhập");
-    if (fav) { await removeFavorite(id); setFav(false); }
-    else { await addFavorite(id); setFav(true); }
+    const prevFav = fav;
+    setFav(!fav);
+    try {
+      if (prevFav) await removeFavorite(id);
+      else await addFavorite(id);
+    } catch {
+      setFav(prevFav);
+    }
   };
 
   if (loading) return <div className="text-center py-20 text-gray-500">Đang tải...</div>;
@@ -61,7 +67,7 @@ export default function DeviceDetail() {
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-white">{device.name}</h1>
           <div className="flex items-end gap-2 mt-1">
-            <span className="text-4xl font-bold text-blue-400">{device.overall_score.toFixed(1)}</span>
+            <span className="text-4xl font-bold text-blue-400">{(device.overall_score ?? 0).toFixed(1)}</span>
             <span className="text-gray-500 mb-1">/ 10</span>
           </div>
           <p className="text-xs text-gray-500 mt-1">{device.total_reviews_analyzed} reviews phân tích · {device.platform}</p>
