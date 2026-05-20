@@ -1,3 +1,4 @@
+import os
 import torch
 import numpy as np
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
@@ -15,9 +16,10 @@ _tokenizer = None
 def _load_model():
     global _model, _tokenizer
     if _model is None:
-        _tokenizer = AutoTokenizer.from_pretrained("/content/phobert_model")
+        model_path = os.getenv("MODEL_PATH", "./phobert_model")
+        _tokenizer = AutoTokenizer.from_pretrained(model_path)
         _model = AutoModelForSequenceClassification.from_pretrained(
-            "/content/phobert_model", num_labels=18, ignore_mismatched_sizes=True
+            model_path, num_labels=18, ignore_mismatched_sizes=True
         )
         _model.eval()
         if torch.cuda.is_available():

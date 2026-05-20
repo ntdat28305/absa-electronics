@@ -9,7 +9,8 @@ def proxy_to_worker(endpoint: str, payload: dict) -> dict:
         raise HTTPException(status_code=503, detail="Worker đang offline. Vui lòng khởi động Colab.")
     try:
         r = httpx.post(f"{url}{endpoint}", json=payload,
-                       headers={"x-worker-key": settings.worker_api_key}, timeout=300)
+                       headers={"x-worker-key": settings.worker_api_key,
+                                "ngrok-skip-browser-warning": "1"}, timeout=300)
         r.raise_for_status()
         return r.json()
     except httpx.TimeoutException:

@@ -22,7 +22,8 @@ def worker_health():
     if not url:
         return {"online": False, "reason": "Worker chưa đăng ký URL"}
     try:
-        r = httpx.get(f"{url}/health", timeout=5)
+        r = httpx.get(f"{url}/health", timeout=5,
+                      headers={"ngrok-skip-browser-warning": "1"})
         return {"online": r.status_code == 200, "url": url}
     except Exception:
         return {"online": False, "url": url}
