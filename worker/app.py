@@ -67,6 +67,7 @@ def crawl_search(data: SearchRequest, x_worker_key: str = Header(...)):
         texts = crawl_product(p, data.reviews_per_link)
         aspects_list = analyze_reviews(texts)
         aspect_scores = compute_aspect_scores(aspects_list)
+        overall_score = compute_overall_score(aspect_scores, len(texts))
         devices.append(
             {
                 "name": p["name"],
@@ -76,6 +77,8 @@ def crawl_search(data: SearchRequest, x_worker_key: str = Header(...)):
                 "platform": p["platform"],
                 "product_url": p["product_url"],
                 "price": p.get("price"),
+                "aspect_scores": aspect_scores,
+                "overall_score": overall_score,
                 "reviews": [{"text": t, "aspects": a} for t, a in zip(texts, aspects_list)],
             }
         )
@@ -89,8 +92,22 @@ def crawl_link(data: LinkRequest, x_worker_key: str = Header(...)):
     parts = data.url.rstrip("/").split("/")
 
     if platform == "shopee":
-        item_id = int(parts[-1]) if parts[-1].isdigit() else 0
-        shop_id = int(parts[-2]) if len(parts) > 1 and parts[-2].isdigit() else 0
+        # Shopee URL formats:
+        # /product/{shop_id}/{item_id}  (old)
+        # /product-name-i.{shop_id}.{item_id}  (new slug format)
+        shop_id, item_id = 0, 0
+        last = parts[-1]
+        if "." in last:
+            # slug format: split by "." and take last two numeric segments
+            seg = last.split(".")
+            try:
+                item_id = int(seg[-1])
+                shop_id = int(seg[-2])
+            except (ValueError, IndexError):
+                pass
+        elif last.isdigit() and len(parts) > 1 and parts[-2].isdigit():
+            item_id = int(last)
+            shop_id = int(parts[-2])
         p = {"platform": "shopee", "shop_id": shop_id, "item_id": item_id}
         name = f"Sản phẩm Shopee #{item_id}"
     else:
@@ -106,6 +123,8 @@ def crawl_link(data: LinkRequest, x_worker_key: str = Header(...)):
 
     texts = crawl_product(p, data.count)
     aspects_list = analyze_reviews(texts)
+    aspect_scores = compute_aspect_scores(aspects_list)
+    overall_score = compute_overall_score(aspect_scores, len(texts))
     return {
         "devices": [
             {
@@ -114,6 +133,8 @@ def crawl_link(data: LinkRequest, x_worker_key: str = Header(...)):
                 "brand": "Unknown",
                 "platform": platform,
                 "product_url": data.url,
+                "aspect_scores": aspect_scores,
+                "overall_score": overall_score,
                 "reviews": [{"text": t, "aspects": a} for t, a in zip(texts, aspects_list)],
             }
         ]
