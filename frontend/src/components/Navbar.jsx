@@ -1,10 +1,11 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Home, Search, ScanLine, History, Heart } from "lucide-react";
 
 const NAV_LINKS = [
-  { to: "/", label: "Trang chủ" },
-  { to: "/search", label: "Tìm kiếm" },
-  { to: "/analyze", label: "Phân tích link" },
+  { to: "/",        label: "Trang chủ",    icon: Home },
+  { to: "/search",  label: "Tìm kiếm",     icon: Search },
+  { to: "/analyze", label: "Phân tích link", icon: ScanLine },
 ];
 
 export default function Navbar() {
@@ -14,6 +15,13 @@ export default function Navbar() {
 
   const isActive = (path) => location.pathname === path;
 
+  const linkClass = (path) =>
+    `flex items-center gap-1.5 text-sm px-5 py-4 border-b-2 transition-colors ${
+      isActive(path)
+        ? "border-blue-500 text-blue-700 font-medium"
+        : "border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300"
+    }`;
+
   return (
     <nav className="bg-white border-b border-gray-200 px-6 py-0 flex items-center sticky top-0 z-50 shadow-sm">
       <Link to="/" className="font-extrabold text-blue-500 text-lg mr-8 py-4 flex items-center gap-2">
@@ -21,28 +29,20 @@ export default function Navbar() {
       </Link>
 
       <div className="flex flex-1 gap-1">
-        {NAV_LINKS.map(({ to, label }) => (
-          <Link key={to} to={to}
-            className={`text-sm px-5 py-4 border-b-2 transition-colors ${
-              isActive(to)
-                ? "border-blue-500 text-blue-700 font-medium"
-                : "border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300"
-            }`}>
+        {NAV_LINKS.map(({ to, label, icon: Icon }) => (
+          <Link key={to} to={to} className={linkClass(to)}>
+            <Icon size={15} />
             {label}
           </Link>
         ))}
         {user && (
           <>
-            <Link to="/history"
-              className={`flex items-center gap-1.5 text-sm px-3 py-4 border-b-2 transition-colors ${
-                isActive("/history") ? "border-blue-500 text-blue-700 font-medium" : "border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300"
-              }`}>
-               Lịch sử
+            <Link to="/history" className={linkClass("/history")}>
+              <History size={15} />
+              Lịch sử
             </Link>
-            <Link to="/favorites"
-              className={`flex items-center gap-1.5 text-sm px-3 py-4 border-b-2 transition-colors ${
-                isActive("/favorites") ? "border-blue-500 text-blue-700 font-medium" : "border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300"
-              }`}>
+            <Link to="/favorites" className={linkClass("/favorites")}>
+              <Heart size={15} />
               Ưu thích
             </Link>
           </>
