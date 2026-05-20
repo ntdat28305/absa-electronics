@@ -5,7 +5,7 @@ import time
 
 
 def get_headers(referer: str) -> dict:
-    return {
+    headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Referer": referer,
         "Accept": "application/json, text/plain, */*",
@@ -15,6 +15,10 @@ def get_headers(referer: str) -> dict:
         "X-API-SOURCE": "pc",
         "X-Shopee-Language": "vi",
     }
+    shopee_cookie = os.getenv("SHOPEE_COOKIE", "")
+    if shopee_cookie:
+        headers["Cookie"] = shopee_cookie
+    return headers
 
 
 def _get_shopee_proxy() -> dict | None:
