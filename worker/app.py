@@ -144,7 +144,7 @@ def crawl_link(data: LinkRequest, x_worker_key: str = Header(...)):
                 "image_url": image_url,
                 "price": price,
                 "platform": platform,
-                "product_url": data.url,
+                "product_url": data.url.split("?")[0],
                 "aspect_scores": aspect_scores,
                 "overall_score": overall_score,
                 "reviews": [{"text": t, "aspects": a} for t, a in zip(texts, aspects_list)],

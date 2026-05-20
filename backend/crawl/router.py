@@ -33,6 +33,11 @@ def crawl_search(data: SearchRequest, db: Session = Depends(get_db)):
 
 @router.post("/link")
 def crawl_link(data: LinkRequest, db: Session = Depends(get_db)):
+    from models import Device
+    clean_url = data.url.split("?")[0]
+    existing = db.query(Device).filter(Device.product_url == clean_url).first()
+    if existing:
+        return {"source": "db", "devices": [existing.id]}
     result = proxy_to_worker("/crawl/link", data.model_dump())
     batch = DeviceBatchRequest(**result, source=SourceEnum.user_link)
     saved = save_batch(db, batch.devices, batch.source)
