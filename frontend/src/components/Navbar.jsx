@@ -23,7 +23,7 @@ export default function Navbar() {
       <div className="flex flex-1 gap-1">
         {NAV_LINKS.map(({ to, label }) => (
           <Link key={to} to={to}
-            className={`text-sm px-3 py-4 border-b-2 transition-colors ${
+            className={`text-sm px-5 py-4 border-b-2 transition-colors ${
               isActive(to)
                 ? "border-orange-500 text-orange-600 font-medium"
                 : "border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300"
