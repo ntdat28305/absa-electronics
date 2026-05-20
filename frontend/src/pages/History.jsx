@@ -43,7 +43,7 @@ export default function History() {
             <Link
               key={h.id}
               to={h.device_id ? `/devices/${h.device_id}` : "#"}
-              className="bg-white border border-gray-100 rounded-xl p-4 flex items-center gap-4 hover:border-orange-200 hover:shadow-sm transition-all shadow-sm"
+              className="bg-white border border-gray-100 rounded-xl p-4 flex items-center gap-4 hover:border-blue-200 hover:shadow-sm transition-all shadow-sm"
             >
               <span className="text-xl">{TYPE_ICON[h.query_type] || "📋"}</span>
               <div className="flex-1 min-w-0">

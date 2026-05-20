@@ -44,12 +44,12 @@ export default function Search() {
             onChange={e => setQuery(e.target.value)}
             onKeyDown={e => e.key === "Enter" && handleSearch()}
             placeholder="Nhập tên thiết bị... (VD: iPhone 15, Samsung Galaxy S24)"
-            className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 shadow-sm transition-all"
+            className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 shadow-sm transition-all"
           />
           <button
             onClick={handleSearch}
             disabled={phase === "crawling"}
-            className="bg-orange-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-orange-600 disabled:opacity-50 shadow-sm transition-colors"
+            className="bg-blue-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 shadow-sm transition-colors"
           >
             {phase === "crawling" ? "⏳ Đang cào..." : "🔍 Tìm kiếm"}
           </button>
@@ -60,7 +60,7 @@ export default function Search() {
             <input
               type="number" min={1} max={10} value={numLinks}
               onChange={e => setNumLinks(parseInt(e.target.value) || 1)}
-              className="w-24 bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all"
+              className="w-24 bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
             />
           </div>
           <div>
@@ -68,7 +68,7 @@ export default function Search() {
             <input
               type="number" min={10} max={200} value={reviewsPerLink}
               onChange={e => setReviewsPerLink(parseInt(e.target.value) || 10)}
-              className="w-28 bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all"
+              className="w-28 bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
             />
           </div>
         </div>

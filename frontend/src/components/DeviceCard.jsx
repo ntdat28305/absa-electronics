@@ -24,11 +24,11 @@ export default function DeviceCard({ device, isFavorited = false, onFavoriteChan
     } finally { setLoading(false); }
   };
 
-  const scoreColor = device.overall_score >= 8 ? "text-emerald-600" : device.overall_score >= 6 ? "text-orange-500" : "text-red-500";
+  const scoreColor = device.overall_score >= 8 ? "text-emerald-600" : device.overall_score >= 6 ? "text-blue-500" : "text-red-500";
 
   return (
     <Link to={`/devices/${device.id}`}
-      className="block bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md hover:border-orange-200 transition-all duration-200 group">
+      className="block bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-200 group">
       <div className="relative bg-gray-50">
         {device.image_url ? (
           <img src={device.image_url} alt={device.name}
@@ -56,7 +56,7 @@ export default function DeviceCard({ device, isFavorited = false, onFavoriteChan
           <span className={`text-2xl font-bold ${scoreColor}`}>{device.overall_score.toFixed(1)}</span>
           <span className="text-xs text-gray-400">{device.total_reviews_analyzed} reviews</span>
         </div>
-        {device.price && <div className="text-xs text-orange-500 font-medium mt-1">{device.price}</div>}
+        {device.price && <div className="text-xs text-blue-500 font-medium mt-1">{device.price}</div>}
         <div className="mt-2.5">
           <AspectBadges aspectScores={topAspects} />
         </div>

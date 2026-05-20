@@ -16,7 +16,7 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white border-b border-gray-200 px-6 py-0 flex items-center sticky top-0 z-50 shadow-sm">
-      <Link to="/" className="font-extrabold text-orange-500 text-lg mr-8 py-4 flex items-center gap-2">
+      <Link to="/" className="font-extrabold text-blue-500 text-lg mr-8 py-4 flex items-center gap-2">
         <img src="/logo.jpg" alt="logo" className="w-8 h-8 object-contain" /> G5
       </Link>
 
@@ -25,7 +25,7 @@ export default function Navbar() {
           <Link key={to} to={to}
             className={`text-sm px-5 py-4 border-b-2 transition-colors ${
               isActive(to)
-                ? "border-orange-500 text-orange-600 font-medium"
+                ? "border-blue-500 text-blue-700 font-medium"
                 : "border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300"
             }`}>
             {label}
@@ -35,15 +35,15 @@ export default function Navbar() {
           <>
             <Link to="/history"
               className={`flex items-center gap-1.5 text-sm px-3 py-4 border-b-2 transition-colors ${
-                isActive("/history") ? "border-orange-500 text-orange-600 font-medium" : "border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300"
+                isActive("/history") ? "border-blue-500 text-blue-700 font-medium" : "border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300"
               }`}>
-              🕐 Lịch sử
+               Lịch sử
             </Link>
             <Link to="/favorites"
               className={`flex items-center gap-1.5 text-sm px-3 py-4 border-b-2 transition-colors ${
-                isActive("/favorites") ? "border-orange-500 text-orange-600 font-medium" : "border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300"
+                isActive("/favorites") ? "border-blue-500 text-blue-700 font-medium" : "border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300"
               }`}>
-              ♡ Ưu thích
+              Ưu thích
             </Link>
           </>
         )}
@@ -51,7 +51,7 @@ export default function Navbar() {
 
       {user ? (
         <div className="flex items-center gap-3 py-4">
-          <div className="w-7 h-7 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold">
+          <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">
             {user.display_name?.[0]?.toUpperCase()}
           </div>
           <span className="text-sm text-gray-700 font-medium">{user.display_name}</span>
@@ -65,7 +65,7 @@ export default function Navbar() {
           <Link to="/login" className="text-sm text-gray-600 hover:text-gray-900 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors">
             Đăng nhập
           </Link>
-          <Link to="/register" className="text-sm bg-orange-500 text-white px-4 py-1.5 rounded-lg hover:bg-orange-600 transition-colors font-medium shadow-sm">
+          <Link to="/register" className="text-sm bg-blue-500 text-white px-4 py-1.5 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm">
             Đăng ký
           </Link>
         </div>

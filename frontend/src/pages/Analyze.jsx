@@ -44,20 +44,20 @@ export default function Analyze() {
           value={url}
           onChange={e => { setUrl(e.target.value); setError(""); }}
           placeholder="https://tiki.vn/..."
-          className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm mb-4 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 shadow-sm transition-all"
+          className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm mb-4 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 shadow-sm transition-all"
         />
         <div className="flex items-center gap-4 mb-5">
           <label className="text-xs font-medium text-gray-500 shrink-0">Số reviews cần cào:</label>
           <input
             type="number" min={10} max={200} value={count}
             onChange={e => setCount(Math.min(200, Math.max(10, parseInt(e.target.value) || 10)))}
-            className="w-24 bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all"
+            className="w-24 bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
           />
         </div>
         <button
           onClick={handleAnalyze}
           disabled={phase === "crawling"}
-          className="bg-orange-500 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-orange-600 disabled:opacity-50 shadow-sm transition-colors"
+          className="bg-blue-500 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 shadow-sm transition-colors"
         >
           {phase === "crawling" ? "⏳ Đang phân tích..." : "▶ Phân tích"}
         </button>

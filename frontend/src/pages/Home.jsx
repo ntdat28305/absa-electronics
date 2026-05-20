@@ -93,7 +93,7 @@ export default function Home() {
 
           <button onClick={() => handleCategoryClick("")}
             className={`block w-full text-left text-sm px-3 py-1.5 rounded-lg mb-0.5 transition-colors ${
-              category === "" && expandedCat === "" ? "bg-orange-50 text-orange-600 font-medium" : "text-gray-600 hover:bg-gray-100"
+              category === "" && expandedCat === "" ? "bg-blue-50 text-blue-700 font-medium" : "text-gray-600 hover:bg-gray-100"
             }`}>
             Tất cả
           </button>
@@ -102,17 +102,17 @@ export default function Home() {
           <div>
             <button onClick={() => handleCategoryClick("phone")}
               className={`flex items-center justify-between w-full text-left text-sm px-3 py-1.5 rounded-lg mb-0.5 transition-colors ${
-                category === "phone" ? "bg-orange-50 text-orange-600 font-medium" : "text-gray-600 hover:bg-gray-100"
+                category === "phone" ? "bg-blue-50 text-blue-700 font-medium" : "text-gray-600 hover:bg-gray-100"
               }`}>
               <span>📱 Điện thoại</span>
               <span className="text-xs text-gray-400">{expandedCat === "phone" ? "▾" : "▸"}</span>
             </button>
             {expandedCat === "phone" && (
-              <div className="ml-3 mb-1 border-l-2 border-orange-100 pl-2">
+              <div className="ml-3 mb-1 border-l-2 border-blue-100 pl-2">
                 {PHONE_BRANDS.map(b => (
                   <button key={b} onClick={() => { setBrand(brand === b ? "" : b); setPage(1); }}
                     className={`block w-full text-left text-xs px-2 py-1 rounded-lg mb-0.5 transition-colors ${
-                      brand === b ? "text-orange-600 bg-orange-50 font-medium" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                      brand === b ? "text-blue-700 bg-blue-50 font-medium" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                     }`}>
                     {b}
                   </button>
@@ -125,17 +125,17 @@ export default function Home() {
           <div>
             <button onClick={() => handleCategoryClick("laptop")}
               className={`flex items-center justify-between w-full text-left text-sm px-3 py-1.5 rounded-lg mb-0.5 transition-colors ${
-                category === "laptop" ? "bg-orange-50 text-orange-600 font-medium" : "text-gray-600 hover:bg-gray-100"
+                category === "laptop" ? "bg-blue-50 text-blue-700 font-medium" : "text-gray-600 hover:bg-gray-100"
               }`}>
               <span>💻 Laptop</span>
               <span className="text-xs text-gray-400">{expandedCat === "laptop" ? "▾" : "▸"}</span>
             </button>
             {expandedCat === "laptop" && (
-              <div className="ml-3 mb-1 border-l-2 border-orange-100 pl-2">
+              <div className="ml-3 mb-1 border-l-2 border-blue-100 pl-2">
                 {LAPTOP_BRANDS.map(b => (
                   <button key={b} onClick={() => { setBrand(brand === b ? "" : b); setPage(1); }}
                     className={`block w-full text-left text-xs px-2 py-1 rounded-lg mb-0.5 transition-colors ${
-                      brand === b ? "text-orange-600 bg-orange-50 font-medium" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                      brand === b ? "text-blue-700 bg-blue-50 font-medium" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                     }`}>
                     {b}
                   </button>
@@ -153,9 +153,9 @@ export default function Home() {
               value={searchInput}
               onChange={e => setSearchInput(e.target.value)}
               placeholder="Tìm trong kho (iphone, samsung...)"
-              className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 shadow-sm transition-all"
+              className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 shadow-sm transition-all"
             />
-            <button type="submit" className="bg-orange-500 text-white px-4 py-2 rounded-xl text-sm hover:bg-orange-600 shadow-sm transition-colors">🔍</button>
+            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-xl text-sm hover:bg-blue-700 shadow-sm transition-colors">🔍</button>
             {searchResults !== null && (
               <button type="button" onClick={clearSearch} className="px-3 py-2 bg-gray-100 rounded-xl text-sm text-gray-600 hover:bg-gray-200 transition-colors">✕</button>
             )}

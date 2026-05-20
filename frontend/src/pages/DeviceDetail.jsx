@@ -44,7 +44,7 @@ export default function DeviceDetail() {
   if (error) return <div className="text-center py-20 text-red-500">{error}</div>;
   if (!device) return null;
 
-  const scoreColor = device.overall_score >= 8 ? "text-emerald-600" : device.overall_score >= 6 ? "text-orange-500" : "text-red-500";
+  const scoreColor = device.overall_score >= 8 ? "text-emerald-600" : device.overall_score >= 6 ? "text-blue-500" : "text-red-500";
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
@@ -69,11 +69,11 @@ export default function DeviceDetail() {
               <span className="text-gray-400 text-sm block">/ 10</span>
             </div>
           </div>
-          {device.price && <p className="text-orange-500 font-semibold mt-2">{device.price}</p>}
+          {device.price && <p className="text-blue-500 font-semibold mt-2">{device.price}</p>}
           <div className="flex gap-2 mt-4">
             {device.product_url && (
               <a href={device.product_url} target="_blank" rel="noreferrer"
-                className="text-sm bg-orange-500 text-white px-5 py-2 rounded-xl hover:bg-orange-600 font-medium shadow-sm transition-colors">
+                className="text-sm bg-blue-500 text-white px-5 py-2 rounded-xl hover:bg-blue-700 font-medium shadow-sm transition-colors">
                 🛒 Mua ngay
               </a>
             )}
