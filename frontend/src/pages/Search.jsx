@@ -19,7 +19,7 @@ export default function Search() {
     setError("");
     setResults([]);
     try {
-      const r = await crawlSearch({ query, num_links: numLinks, reviews_per_link: reviewsPerLink, platform });
+      const r = await crawlSearch({ query, num_links: numLinks, reviews_per_link: reviewsPerLink, platform, force_crawl: true });
       const ids = r.data.devices || [];
       const devices = await Promise.all(ids.map(id => getDevice(id).then(r => r.data)));
       setResults(devices);
