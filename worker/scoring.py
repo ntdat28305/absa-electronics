@@ -23,5 +23,5 @@ def compute_overall_score(aspect_scores: dict, total_reviews: int) -> float:
     if not values:
         return 0.0
     mean_positive = sum(values) / len(values)
-    confidence = min(1.0, math.log(total_reviews + 1) / math.log(31))
+    confidence = min(1.0, math.log(total_reviews + 1) / math.log(11))
     return round((mean_positive * confidence + 50 * (1 - confidence)) / 10, 2)
