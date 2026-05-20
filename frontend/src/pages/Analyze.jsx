@@ -11,10 +11,10 @@ export default function Analyze() {
   const [device, setDevice] = useState(null);
   const [error, setError] = useState("");
 
-  const isValidUrl = (s) => s.includes("tiki.vn");
+  const isValidUrl = (s) => s.includes("tiki.vn") || s.includes("shopee.vn");
 
   const handleAnalyze = async () => {
-    if (!isValidUrl(url)) { setError("Chỉ hỗ trợ link Tiki (Shopee chặn crawl)"); return; }
+    if (!isValidUrl(url)) { setError("Chỉ hỗ trợ link Tiki hoặc Shopee"); return; }
     setPhase("crawling");
     setError("");
     setDevice(null);
@@ -39,11 +39,11 @@ export default function Analyze() {
       </div>
 
       <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 mb-6">
-        <label className="text-xs font-medium text-gray-500 block mb-1.5">Link sản phẩm Tiki</label>
+        <label className="text-xs font-medium text-gray-500 block mb-1.5">Link sản phẩm Tiki / Shopee</label>
         <input
           value={url}
           onChange={e => { setUrl(e.target.value); setError(""); }}
-          placeholder="https://tiki.vn/..."
+          placeholder="https://tiki.vn/... hoặc https://shopee.vn/..."
           className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm mb-4 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 shadow-sm transition-all"
         />
         <div className="flex items-center gap-4 mb-5">
