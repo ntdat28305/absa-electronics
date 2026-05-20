@@ -16,8 +16,8 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white border-b border-gray-200 px-6 py-0 flex items-center sticky top-0 z-50 shadow-sm">
-      <Link to="/" className="font-extrabold text-orange-500 text-lg mr-8 py-4 flex items-center gap-1.5">
-        <span className="text-xl">⚡</span> DevSense
+      <Link to="/" className="font-extrabold text-orange-500 text-lg mr-8 py-4 flex items-center gap-2">
+        <img src="/logo.jpg" alt="logo" className="w-8 h-8 object-contain" /> G5
       </Link>
 
       <div className="flex flex-1 gap-1">
