@@ -1,56 +1,51 @@
-import requests
-import uuid
-import json
+import torch
+import numpy as np
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from underthesea import word_tokenize
 
-HF_SPACE_BASE = "https://ntdat232-absa-electronics-api.hf.space"
+CATEGORIES = [
+    "Battery", "Camera", "Customer_Service", "Design",
+    "Feature", "General", "Performance", "Price", "Screen"
+]
+
+_model = None
+_tokenizer = None
+
+
+def _load_model():
+    global _model, _tokenizer
+    if _model is None:
+        _tokenizer = AutoTokenizer.from_pretrained("/content/phobert_model")
+        _model = AutoModelForSequenceClassification.from_pretrained(
+            "/content/phobert_model", num_labels=18, ignore_mismatched_sizes=True
+        )
+        _model.eval()
+        if torch.cuda.is_available():
+            _model = _model.cuda()
 
 
 def predict_absa(text: str) -> list[dict]:
-    session_hash = uuid.uuid4().hex[:8]
-    try:
-        resp = requests.post(
-            f"{HF_SPACE_BASE}/gradio_api/queue/join",
-            json={"data": [text.strip()], "fn_index": 0, "session_hash": session_hash},
-            headers={"Content-Type": "application/json"},
-            timeout=15,
-        )
-        resp.raise_for_status()
-        event_id = resp.json().get("event_id")
-        if not event_id:
-            return []
-        stream = requests.get(
-            f"{HF_SPACE_BASE}/gradio_api/queue/data",
-            params={"session_hash": session_hash},
-            stream=True,
-            timeout=120,
-        )
-        for line in stream.iter_lines():
-            if not line:
-                continue
-            decoded = line.decode("utf-8")
-            if not decoded.startswith("data:"):
-                continue
-            payload = json.loads(decoded[5:].strip())
-            if payload.get("msg") == "process_completed":
-                if not payload.get("success"):
-                    return []
-                raw = payload["output"]["data"][0]
-                return [
-                    {
-                        "aspect": a.get("category", ""),
-                        "sentiment": a.get("sentiment", ""),
-                        "confidence": None,
-                    }
-                    for a in (raw if isinstance(raw, list) else [])
-                ]
-    except Exception as e:
-        print(f"[HF Error] {e}")
-    return []
+    _load_model()
+    segmented = word_tokenize(text, format="text")
+    inputs = _tokenizer(
+        segmented, return_tensors="pt", truncation=True,
+        max_length=256, padding=True
+    )
+    if torch.cuda.is_available():
+        inputs = {k: v.cuda() for k, v in inputs.items()}
+    with torch.no_grad():
+        logits = _model(**inputs).logits
+    probs = torch.sigmoid(logits).squeeze().cpu().numpy()
+    results = []
+    for idx, cat in enumerate(CATEGORIES):
+        neg = float(probs[idx * 2])
+        pos = float(probs[idx * 2 + 1])
+        if pos > 0.5:
+            results.append({"aspect": cat, "sentiment": "Positive", "confidence": pos})
+        elif neg > 0.5:
+            results.append({"aspect": cat, "sentiment": "Negative", "confidence": neg})
+    return results
 
 
 def analyze_reviews(texts: list[str]) -> list[list[dict]]:
-    results = []
-    for text in texts:
-        aspects = predict_absa(text)
-        results.append(aspects)
-    return results
+    return [predict_absa(t) for t in texts]
