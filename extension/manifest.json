@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "ABSA Tech Reviewer",
+  "version": "1.2",
+  "description": "Tự động cào và phân tích cảm xúc bình luận Shopee & Tiki",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": ["activeTab", "scripting", "storage"],
+  "content_scripts": [
+    {
+      "matches": ["*://shopee.vn/*", "*://tiki.vn/*"],
+      "js": ["content.js"]
+    }
+  ]
+}

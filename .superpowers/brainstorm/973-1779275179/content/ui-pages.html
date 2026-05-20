@@ -1,0 +1,107 @@
+<h2>UI Pages — DevSense Web</h2>
+<p class="subtitle">Các trang và luồng điều hướng của ứng dụng</p>
+
+<div class="section">
+  <h3>Cấu trúc trang</h3>
+
+  <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">
+
+    <!-- Navbar -->
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px;">
+      <div style="font-size:11px;font-weight:700;color:#ff6030;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em;">Navbar (mọi trang)</div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:11px;">
+        <span style="font-weight:700;color:#e8eaf0;">⚡ DevSense</span>
+        <span style="color:#7a8099;">|</span>
+        <span style="color:#4da6ff;">🗄 Kho DB</span>
+        <span style="color:#7a8099;">🔍 Tìm kiếm</span>
+        <span style="color:#7a8099;">🔗 Phân tích link</span>
+        <span style="color:#7a8099;">🕐 Lịch sử</span>
+        <span style="margin-left:auto;color:#7a8099;">👤 Đăng nhập</span>
+      </div>
+    </div>
+
+    <!-- Page 1 -->
+    <div style="background:rgba(77,166,255,0.06);border:1px solid rgba(77,166,255,0.2);border-radius:8px;padding:12px;">
+      <div style="font-size:11px;font-weight:700;color:#4da6ff;margin-bottom:6px;">1. Kho thiết bị (trang chủ)</div>
+      <div style="font-size:11px;color:#7a8099;margin-bottom:8px;">Filter: Tất cả | Điện thoại | Laptop &nbsp;+&nbsp; Hãng &nbsp;+&nbsp; Sort by: Điểm cao nhất</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+        <div style="background:rgba(255,255,255,0.05);border-radius:6px;padding:8px;text-align:center;">
+          <div style="width:40px;height:40px;background:rgba(255,255,255,0.08);border-radius:4px;margin:0 auto 4px;"></div>
+          <div style="font-size:10px;font-weight:600;color:#e8eaf0;">iPhone 15</div>
+          <div style="font-size:14px;font-weight:700;color:#4da6ff;">8.4</div>
+          <div style="font-size:9px;color:#3ddc84;">📱 Phone</div>
+          <div style="font-size:9px;color:#ffc107;margin-top:2px;">♡ Lưu</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.05);border-radius:6px;padding:8px;text-align:center;">
+          <div style="width:40px;height:40px;background:rgba(255,255,255,0.08);border-radius:4px;margin:0 auto 4px;"></div>
+          <div style="font-size:10px;font-weight:600;color:#e8eaf0;">MacBook Air</div>
+          <div style="font-size:14px;font-weight:700;color:#4da6ff;">9.1</div>
+          <div style="font-size:9px;color:#818cf8;">💻 Laptop</div>
+          <div style="font-size:9px;color:#ffc107;margin-top:2px;">♡ Lưu</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.05);border-radius:6px;padding:8px;text-align:center;">
+          <div style="width:40px;height:40px;background:rgba(255,255,255,0.08);border-radius:4px;margin:0 auto 4px;"></div>
+          <div style="font-size:10px;font-weight:600;color:#e8eaf0;">Galaxy S24</div>
+          <div style="font-size:14px;font-weight:700;color:#4da6ff;">7.9</div>
+          <div style="font-size:9px;color:#3ddc84;">📱 Phone</div>
+          <div style="font-size:9px;color:#ffc107;margin-top:2px;">♡ Lưu</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.05);border-radius:6px;padding:8px;text-align:center;">
+          <div style="width:40px;height:40px;background:rgba(255,255,255,0.08);border-radius:4px;margin:0 auto 4px;"></div>
+          <div style="font-size:10px;font-weight:600;color:#e8eaf0;">ASUS Zenbook</div>
+          <div style="font-size:14px;font-weight:700;color:#4da6ff;">8.0</div>
+          <div style="font-size:9px;color:#818cf8;">💻 Laptop</div>
+          <div style="font-size:9px;color:#ffc107;margin-top:2px;">♡ Lưu</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page 2 -->
+    <div style="background:rgba(61,220,132,0.06);border:1px solid rgba(61,220,132,0.2);border-radius:8px;padding:12px;">
+      <div style="font-size:11px;font-weight:700;color:#3ddc84;margin-bottom:6px;">2. Trang chi tiết sản phẩm</div>
+      <div style="display:flex;gap:10px;font-size:11px;">
+        <div style="width:60px;height:60px;background:rgba(255,255,255,0.08);border-radius:6px;flex-shrink:0;"></div>
+        <div>
+          <div style="font-weight:700;color:#e8eaf0;">iPhone 15 Pro Max</div>
+          <div style="color:#4da6ff;font-size:18px;font-weight:700;">8.4 <span style="font-size:11px;color:#7a8099">/ 10</span></div>
+          <div style="color:#7a8099;font-size:10px;">Phân tích từ 120 reviews · Shopee + Tiki</div>
+        </div>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:5px;flex-wrap:wrap;font-size:10px;">
+        <span style="background:rgba(61,220,132,0.15);color:#3ddc84;padding:2px 7px;border-radius:4px;">📶 Pin 82%↑</span>
+        <span style="background:rgba(61,220,132,0.15);color:#3ddc84;padding:2px 7px;border-radius:4px;">⚡ Hiệu năng 91%↑</span>
+        <span style="background:rgba(255,96,48,0.15);color:#ff6060;padding:2px 7px;border-radius:4px;">💰 Giá 38%↓</span>
+        <span style="background:rgba(61,220,132,0.15);color:#3ddc84;padding:2px 7px;border-radius:4px;">📸 Camera 78%↑</span>
+      </div>
+      <div style="margin-top:6px;font-size:10px;color:#7a8099;">+ Radar chart · Progress bars · Review list có filter · Link mua hàng</div>
+    </div>
+
+    <!-- Page 3 -->
+    <div style="background:rgba(255,193,7,0.06);border:1px solid rgba(255,193,7,0.2);border-radius:8px;padding:12px;">
+      <div style="font-size:11px;font-weight:700;color:#ffc107;margin-bottom:6px;">3. Tìm kiếm (Search + Crawl fallback)</div>
+      <div style="background:rgba(255,255,255,0.06);border-radius:6px;padding:8px;font-size:11px;color:#7a8099;margin-bottom:8px;">🔍 "Samsung Galaxy A55"</div>
+      <div style="font-size:10px;color:#7a8099;margin-bottom:4px;">Không tìm thấy trong DB → Cào mới:</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:10px;">
+        <span style="color:#7a8099;">Số reviews cần cào:</span>
+        <span style="background:rgba(255,255,255,0.08);padding:2px 10px;border-radius:4px;color:#e8eaf0;font-weight:700;">50</span>
+        <span style="color:#7a8099;">Nền tảng:</span>
+        <span style="background:rgba(255,96,48,0.15);color:#ff6030;padding:2px 8px;border-radius:4px;">Shopee</span>
+        <span style="color:#7a8099;">Tiki</span>
+      </div>
+    </div>
+
+    <!-- Page 4 -->
+    <div style="background:rgba(129,140,248,0.06);border:1px solid rgba(129,140,248,0.2);border-radius:8px;padding:12px;">
+      <div style="font-size:11px;font-weight:700;color:#818cf8;margin-bottom:6px;">4. Phân tích link trực tiếp</div>
+      <div style="background:rgba(255,255,255,0.06);border-radius:6px;padding:8px;font-size:11px;color:#7a8099;margin-bottom:6px;">🔗 https://shopee.vn/product/...</div>
+      <div style="font-size:10px;color:#7a8099;">Kết quả + lưu DB + thêm vào lịch sử</div>
+    </div>
+
+    <!-- Page 5 -->
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px;">
+      <div style="font-size:11px;font-weight:700;color:#e8eaf0;margin-bottom:6px;">5. Lịch sử · 6. Ưu thích · 7. Auth (Login/Register)</div>
+      <div style="font-size:10px;color:#7a8099;">Lịch sử: timeline các lần phân tích, click vào xem lại kết quả<br>Ưu thích: grid thiết bị đã lưu, giống trang chủ<br>Auth: form đăng ký / đăng nhập, JWT token</div>
+    </div>
+
+  </div>
+</div>
