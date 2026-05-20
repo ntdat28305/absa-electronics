@@ -10,8 +10,12 @@ export default function WorkerStatus() {
 
   if (!status) return null;
   return (
-    <div className={`flex items-center gap-1.5 text-xs font-mono px-2 py-1 rounded ${status.online ? "text-green-400" : "text-red-400"}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${status.online ? "bg-green-400" : "bg-red-400"}`} />
+    <div className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium ${
+      status.online
+        ? "text-emerald-700 bg-emerald-50 border-emerald-200"
+        : "text-red-600 bg-red-50 border-red-200"
+    }`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${status.online ? "bg-emerald-500" : "bg-red-500"}`} />
       Worker {status.online ? "online" : "offline"}
     </div>
   );

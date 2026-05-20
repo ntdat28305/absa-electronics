@@ -89,25 +89,31 @@ export default function Home() {
       <div className="flex gap-6">
         {/* Sidebar */}
         <aside className="w-48 shrink-0">
-          <h3 className="text-xs font-mono text-gray-500 uppercase mb-3">Danh mục</h3>
+          <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Danh mục</h3>
 
           <button onClick={() => handleCategoryClick("")}
-            className={`block w-full text-left text-sm px-3 py-1.5 rounded mb-1 ${category === "" && expandedCat === "" ? "bg-orange-500/20 text-orange-400" : "text-gray-400 hover:text-white"}`}>
+            className={`block w-full text-left text-sm px-3 py-1.5 rounded-lg mb-0.5 transition-colors ${
+              category === "" && expandedCat === "" ? "bg-orange-50 text-orange-600 font-medium" : "text-gray-600 hover:bg-gray-100"
+            }`}>
             Tất cả
           </button>
 
           {/* Điện thoại — collapsible */}
           <div>
             <button onClick={() => handleCategoryClick("phone")}
-              className={`flex items-center justify-between w-full text-left text-sm px-3 py-1.5 rounded mb-1 ${category === "phone" ? "bg-orange-500/20 text-orange-400" : "text-gray-400 hover:text-white"}`}>
+              className={`flex items-center justify-between w-full text-left text-sm px-3 py-1.5 rounded-lg mb-0.5 transition-colors ${
+                category === "phone" ? "bg-orange-50 text-orange-600 font-medium" : "text-gray-600 hover:bg-gray-100"
+              }`}>
               <span>📱 Điện thoại</span>
-              <span className="text-xs">{expandedCat === "phone" ? "▾" : "▸"}</span>
+              <span className="text-xs text-gray-400">{expandedCat === "phone" ? "▾" : "▸"}</span>
             </button>
             {expandedCat === "phone" && (
-              <div className="ml-4 mb-2">
+              <div className="ml-3 mb-1 border-l-2 border-orange-100 pl-2">
                 {PHONE_BRANDS.map(b => (
                   <button key={b} onClick={() => { setBrand(brand === b ? "" : b); setPage(1); }}
-                    className={`block w-full text-left text-xs px-2 py-1 rounded mb-0.5 ${brand === b ? "text-orange-400 bg-orange-500/10" : "text-gray-500 hover:text-gray-300"}`}>
+                    className={`block w-full text-left text-xs px-2 py-1 rounded-lg mb-0.5 transition-colors ${
+                      brand === b ? "text-orange-600 bg-orange-50 font-medium" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                    }`}>
                     {b}
                   </button>
                 ))}
@@ -118,15 +124,19 @@ export default function Home() {
           {/* Laptop — collapsible */}
           <div>
             <button onClick={() => handleCategoryClick("laptop")}
-              className={`flex items-center justify-between w-full text-left text-sm px-3 py-1.5 rounded mb-1 ${category === "laptop" ? "bg-orange-500/20 text-orange-400" : "text-gray-400 hover:text-white"}`}>
+              className={`flex items-center justify-between w-full text-left text-sm px-3 py-1.5 rounded-lg mb-0.5 transition-colors ${
+                category === "laptop" ? "bg-orange-50 text-orange-600 font-medium" : "text-gray-600 hover:bg-gray-100"
+              }`}>
               <span>💻 Laptop</span>
-              <span className="text-xs">{expandedCat === "laptop" ? "▾" : "▸"}</span>
+              <span className="text-xs text-gray-400">{expandedCat === "laptop" ? "▾" : "▸"}</span>
             </button>
             {expandedCat === "laptop" && (
-              <div className="ml-4 mb-2">
+              <div className="ml-3 mb-1 border-l-2 border-orange-100 pl-2">
                 {LAPTOP_BRANDS.map(b => (
                   <button key={b} onClick={() => { setBrand(brand === b ? "" : b); setPage(1); }}
-                    className={`block w-full text-left text-xs px-2 py-1 rounded mb-0.5 ${brand === b ? "text-orange-400 bg-orange-500/10" : "text-gray-500 hover:text-gray-300"}`}>
+                    className={`block w-full text-left text-xs px-2 py-1 rounded-lg mb-0.5 transition-colors ${
+                      brand === b ? "text-orange-600 bg-orange-50 font-medium" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                    }`}>
                     {b}
                   </button>
                 ))}
@@ -138,29 +148,29 @@ export default function Home() {
         {/* Main */}
         <div className="flex-1">
           {/* Search bar */}
-          <form onSubmit={handleSearchSubmit} className="flex gap-2 mb-4">
+          <form onSubmit={handleSearchSubmit} className="flex gap-2 mb-5">
             <input
               value={searchInput}
               onChange={e => setSearchInput(e.target.value)}
               placeholder="Tìm trong kho (iphone, samsung...)"
-              className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-sm outline-none focus:border-orange-500"
+              className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 shadow-sm transition-all"
             />
-            <button type="submit" className="bg-orange-500 text-white px-3 py-1.5 rounded text-sm hover:bg-orange-600">🔍</button>
+            <button type="submit" className="bg-orange-500 text-white px-4 py-2 rounded-xl text-sm hover:bg-orange-600 shadow-sm transition-colors">🔍</button>
             {searchResults !== null && (
-              <button type="button" onClick={clearSearch} className="px-3 py-1.5 bg-gray-700 rounded text-sm text-gray-300 hover:bg-gray-600">✕</button>
+              <button type="button" onClick={clearSearch} className="px-3 py-2 bg-gray-100 rounded-xl text-sm text-gray-600 hover:bg-gray-200 transition-colors">✕</button>
             )}
           </form>
 
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-lg font-bold">
+            <h1 className="text-base font-bold text-gray-900">
               {searchResults !== null
-                ? <>Kết quả: <span className="text-gray-500 text-sm font-normal">"{searchQ}" ({searchResults.length} thiết bị)</span></>
-                : <>Kho thiết bị{!loading && <span className="text-gray-500 text-sm font-normal"> ({total} thiết bị)</span>}</>
+                ? <>Kết quả: <span className="text-gray-400 font-normal text-sm">"{searchQ}" ({searchResults.length} thiết bị)</span></>
+                : <>Kho thiết bị{!loading && <span className="text-gray-400 font-normal text-sm"> ({total} thiết bị)</span>}</>
               }
             </h1>
             {searchResults === null && (
               <select value={sort} onChange={e => setSort(e.target.value)}
-                className="bg-gray-800 border border-gray-700 text-sm rounded px-2 py-1 text-gray-300">
+                className="bg-white border border-gray-200 text-sm rounded-lg px-3 py-1.5 text-gray-600 shadow-sm">
                 <option value="score">Điểm cao nhất</option>
                 <option value="newest">Mới nhất</option>
               </select>
@@ -168,13 +178,13 @@ export default function Home() {
           </div>
 
           {searching ? (
-            <div className="text-center py-20 text-gray-500">Đang tìm kiếm...</div>
+            <div className="text-center py-20 text-gray-400">Đang tìm kiếm...</div>
           ) : loading && searchResults === null ? (
-            <div className="text-center py-20 text-gray-500">Đang tải...</div>
+            <div className="text-center py-20 text-gray-400">Đang tải...</div>
           ) : error ? (
-            <div className="text-center py-20 text-red-400">{error}</div>
+            <div className="text-center py-20 text-red-500">{error}</div>
           ) : displayDevices.length === 0 ? (
-            <div className="text-center py-20 text-gray-500">
+            <div className="text-center py-20 text-gray-400">
               {searchResults !== null ? "Không tìm thấy thiết bị nào" : "Chưa có thiết bị nào trong kho"}
             </div>
           ) : (
@@ -187,9 +197,9 @@ export default function Home() {
 
           {searchResults === null && total > PAGE_SIZE && (
             <div className="flex gap-2 justify-center mt-6">
-              {page > 1 && <button onClick={() => setPage(p => p - 1)} className="px-3 py-1 bg-gray-800 rounded text-sm">← Trước</button>}
-              <span className="px-3 py-1 text-sm text-gray-400">Trang {page}</span>
-              {page * PAGE_SIZE < total && <button onClick={() => setPage(p => p + 1)} className="px-3 py-1 bg-gray-800 rounded text-sm">Tiếp →</button>}
+              {page > 1 && <button onClick={() => setPage(p => p - 1)} className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 shadow-sm">← Trước</button>}
+              <span className="px-4 py-2 text-sm text-gray-400">Trang {page}</span>
+              {page * PAGE_SIZE < total && <button onClick={() => setPage(p => p + 1)} className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 shadow-sm">Tiếp →</button>}
             </div>
           )}
         </div>

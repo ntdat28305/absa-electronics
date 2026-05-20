@@ -14,7 +14,7 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div className="min-h-screen bg-gray-950 text-gray-100">
+        <div className="min-h-screen bg-slate-50 text-gray-900">
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
