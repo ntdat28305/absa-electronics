@@ -4,7 +4,7 @@ from scoring import compute_aspect_scores, compute_overall_score
 from schemas import DeviceBatchItem
 
 def list_devices(db: Session, category=None, brand=None, sort="score", page=1, limit=20):
-    q = db.query(Device)
+    q = db.query(Device).filter(Device.total_reviews_analyzed > 0)
     if category:
         q = q.filter(Device.category == category)
     if brand:

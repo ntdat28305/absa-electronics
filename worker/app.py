@@ -66,6 +66,9 @@ def crawl_search(data: SearchRequest, x_worker_key: str = Header(...)):
     devices = []
     for p in products[: data.num_links]:
         texts = crawl_product(p, data.reviews_per_link)
+        if not texts:
+            print(f"[skip] no reviews for {p.get('name', '')}")
+            continue
         aspects_list = analyze_reviews(texts)
         aspect_scores = compute_aspect_scores(aspects_list)
         overall_score = compute_overall_score(aspect_scores, len(texts))

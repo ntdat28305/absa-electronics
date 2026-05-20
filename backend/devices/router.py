@@ -32,3 +32,21 @@ def batch_save(data: DeviceBatchRequest, x_worker_key: str = Header(...),
         raise HTTPException(status_code=403, detail="Invalid worker API key")
     saved = save_batch(db, data.devices, data.source)
     return [DeviceOut.model_validate(d) for d in saved]
+
+@router.delete("/cleanup", response_model=dict)
+def cleanup_empty(x_worker_key: str = Header(...), db: Session = Depends(get_db)):
+    """Xóa các thiết bị bị crawl lỗi (0 reviews hoặc tên mặc định)."""
+    if x_worker_key != settings.worker_api_key:
+        raise HTTPException(status_code=403, detail="Invalid worker API key")
+    from models import Review, Device
+    bad = db.query(Device).filter(
+        (Device.total_reviews_analyzed == 0) |
+        (Device.name.like("Sản phẩm Tiki #%")) |
+        (Device.name.like("Sản phẩm Shopee #%"))
+    ).all()
+    count = len(bad)
+    for d in bad:
+        db.query(Review).filter(Review.device_id == d.id).delete()
+        db.delete(d)
+    db.commit()
+    return {"deleted": count}
