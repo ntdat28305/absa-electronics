@@ -75,6 +75,30 @@ def search_shopee(query: str, num_links: int, min_reviews: int = 10) -> list[dic
     return results
 
 
+# ─── Tiki Product Detail ──────────────────────────────────────────────────────
+
+def get_tiki_product(product_id: int) -> dict:
+    try:
+        r = requests.get(
+            f"https://tiki.vn/api/v2/products/{product_id}",
+            headers=get_headers("https://tiki.vn/"),
+            timeout=10,
+        )
+        r.raise_for_status()
+        d = r.json()
+        seller_id = d.get("current_seller", {}).get("id") or d.get("seller_id", 1)
+        return {
+            "name": d.get("name", f"Sản phẩm Tiki #{product_id}"),
+            "image_url": d.get("thumbnail_url", ""),
+            "price": f"{d.get('price', 0):,}đ",
+            "product_id": product_id,
+            "seller_id": seller_id,
+        }
+    except Exception as e:
+        print(f"[Tiki product detail error] {e}")
+        return {"name": f"Sản phẩm Tiki #{product_id}", "image_url": "", "price": "", "product_id": product_id, "seller_id": 1}
+
+
 # ─── Tiki Search API ───────────────────────────────────────────────────────────
 
 def search_tiki(query: str, num_links: int, min_reviews: int = 10) -> list[dict]:

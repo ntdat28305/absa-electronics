@@ -4,7 +4,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 
-from crawler import search_shopee, search_tiki, crawl_product
+from crawler import search_shopee, search_tiki, crawl_product, get_tiki_product
 from inferencer import analyze_reviews
 from scoring import compute_aspect_scores, compute_overall_score
 
@@ -125,19 +125,24 @@ def crawl_link(data: LinkRequest, x_worker_key: str = Header(...)):
             if m:
                 product_id = int(m.group(1))
                 break
-        p = {"platform": "tiki", "product_id": product_id, "seller_id": 1}
-        name = f"Sản phẩm Tiki #{product_id}"
+        meta = get_tiki_product(product_id)
+        p = {"platform": "tiki", "product_id": product_id, "seller_id": meta["seller_id"]}
+        name = meta["name"]
 
     texts = crawl_product(p, data.count)
     aspects_list = analyze_reviews(texts)
     aspect_scores = compute_aspect_scores(aspects_list)
     overall_score = compute_overall_score(aspect_scores, len(texts))
+    image_url = meta.get("image_url", "") if platform == "tiki" else ""
+    price = meta.get("price", "") if platform == "tiki" else ""
     return {
         "devices": [
             {
                 "name": name,
-                "category": "phone",
-                "brand": "Unknown",
+                "category": infer_category(name),
+                "brand": infer_brand(name),
+                "image_url": image_url,
+                "price": price,
                 "platform": platform,
                 "product_url": data.url,
                 "aspect_scores": aspect_scores,
