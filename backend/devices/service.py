@@ -31,6 +31,9 @@ def search_devices(db: Session, q: str):
 def save_batch(db: Session, devices: list[DeviceBatchItem], source: SourceEnum):
     saved = []
     for d in devices:
+        # skip duplicate product_url
+        if d.product_url and db.query(Device).filter(Device.product_url == d.product_url).first():
+            continue
         aspect_scores = compute_aspect_scores([r.get("aspects", []) for r in d.reviews])
         overall = compute_overall_score(aspect_scores, len(d.reviews))
         device = Device(
