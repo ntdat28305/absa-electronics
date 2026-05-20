@@ -173,7 +173,7 @@ def search_tiki(query: str, num_links: int, min_reviews: int = 10) -> list[dict]
 
 # ─── Shopee Reviews (undetected_chromedriver) ─────────────────────────────────
 
-def scrape_shopee_reviews(shop_id: int, item_id: int, count: int) -> list[str]:
+def scrape_shopee_reviews(shop_id: int, item_id: int, count: int, product_info: dict = None) -> list[str]:
     try:
         import undetected_chromedriver as uc
     except ImportError:
@@ -214,6 +214,22 @@ def scrape_shopee_reviews(shop_id: int, item_id: int, count: int) -> list[str]:
         # Navigate to product page with cookies active
         driver.get(f"https://shopee.vn/product/{shop_id}/{item_id}")
         time.sleep(5)
+
+        # Extract product metadata from og: meta tags
+        if product_info is not None:
+            try:
+                image_url = driver.execute_script(
+                    "const m=document.querySelector('meta[property=\"og:image\"]'); return m?m.content:'';"
+                ) or ""
+                og_title = driver.execute_script(
+                    "const m=document.querySelector('meta[property=\"og:title\"]'); return m?m.content:'';"
+                ) or ""
+                if image_url:
+                    product_info["image_url"] = image_url
+                if og_title:
+                    product_info["name"] = og_title
+            except Exception:
+                pass
 
         pg = 0
         while len(reviews) < count:
@@ -299,7 +315,7 @@ def scrape_tiki_reviews(product_id: int, seller_id: int, count: int) -> list[str
 def crawl_product(product_info: dict, count: int) -> list[str]:
     platform = product_info.get("platform")
     if platform == "shopee":
-        return scrape_shopee_reviews(product_info["shop_id"], product_info["item_id"], count)
+        return scrape_shopee_reviews(product_info["shop_id"], product_info["item_id"], count, product_info)
     if platform == "tiki":
         return scrape_tiki_reviews(product_info["product_id"], product_info["seller_id"], count)
     return []

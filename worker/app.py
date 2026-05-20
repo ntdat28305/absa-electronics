@@ -4,7 +4,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 
-from crawler import search_shopee, search_tiki, crawl_product, get_tiki_product
+from crawler import search_shopee, search_tiki, crawl_product, get_tiki_product, get_shopee_product
 from inferencer import analyze_reviews
 from scoring import compute_aspect_scores, compute_overall_score
 
@@ -98,23 +98,27 @@ def crawl_link(data: LinkRequest, x_worker_key: str = Header(...)):
     parts = clean_url.split("/")
 
     if platform == "shopee":
-        # Shopee URL formats:
-        # /product/{shop_id}/{item_id}  (old)
-        # /product-name-i.{shop_id}.{item_id}  (new slug format)
+        from urllib.parse import unquote
         shop_id, item_id = 0, 0
         last = parts[-1]
-        if "." in last:
+        # slug format: product-name-i.{shop_id}.{item_id}
+        m = re.search(r"-i\.(\d+)\.(\d+)$", last)
+        if m:
+            shop_id = int(m.group(1))
+            item_id = int(m.group(2))
+            slug = last[:m.start()]
+            name = unquote(slug).replace("-", " ").strip().title()
+        elif "." in last:
             seg = last.split(".")
             try:
                 item_id = int(seg[-1])
                 shop_id = int(seg[-2])
             except (ValueError, IndexError):
                 pass
-        elif last.isdigit() and len(parts) > 1 and parts[-2].isdigit():
-            item_id = int(last)
-            shop_id = int(parts[-2])
-        p = {"platform": "shopee", "shop_id": shop_id, "item_id": item_id}
-        name = f"Sản phẩm Shopee #{item_id}"
+            name = f"Sản phẩm Shopee #{item_id}"
+        else:
+            name = f"Sản phẩm Shopee #{item_id}"
+        p = {"platform": "shopee", "shop_id": shop_id, "item_id": item_id, "name": name, "image_url": "", "price": ""}
     else:
         # Tiki formats:
         # /slug-name-p{id}.html  (common)
@@ -126,15 +130,17 @@ def crawl_link(data: LinkRequest, x_worker_key: str = Header(...)):
                 product_id = int(m.group(1))
                 break
         meta = get_tiki_product(product_id)
-        p = {"platform": "tiki", "product_id": product_id, "seller_id": meta["seller_id"]}
-        name = meta["name"]
+        p = {"platform": "tiki", "product_id": product_id, "seller_id": meta["seller_id"],
+             "name": meta["name"], "image_url": meta.get("image_url", ""), "price": meta.get("price", "")}
 
     texts = crawl_product(p, data.count)
+    # For Shopee: crawl_product populates p["image_url"] and p["name"] from the browser
+    name = p.get("name") or name
     aspects_list = analyze_reviews(texts)
     aspect_scores = compute_aspect_scores(aspects_list)
     overall_score = compute_overall_score(aspect_scores, len(texts))
-    image_url = meta.get("image_url", "") if platform == "tiki" else ""
-    price = meta.get("price", "") if platform == "tiki" else ""
+    image_url = p.get("image_url", "")
+    price = p.get("price", "")
     return {
         "devices": [
             {
