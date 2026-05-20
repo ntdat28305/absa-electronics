@@ -2,9 +2,9 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const NAV_LINKS = [
-  { to: "/", label: "Kho DB", icon: "🗄" },
-  { to: "/search", label: "Tìm kiếm", icon: "🔍" },
-  { to: "/analyze", label: "Phân tích link", icon: "🔗" },
+  { to: "/", label: "Trang chủ" },
+  { to: "/search", label: "Tìm kiếm" },
+  { to: "/analyze", label: "Phân tích link" },
 ];
 
 export default function Navbar() {
@@ -21,14 +21,14 @@ export default function Navbar() {
       </Link>
 
       <div className="flex flex-1 gap-1">
-        {NAV_LINKS.map(({ to, label, icon }) => (
+        {NAV_LINKS.map(({ to, label }) => (
           <Link key={to} to={to}
-            className={`flex items-center gap-1.5 text-sm px-3 py-4 border-b-2 transition-colors ${
+            className={`text-sm px-3 py-4 border-b-2 transition-colors ${
               isActive(to)
                 ? "border-orange-500 text-orange-600 font-medium"
                 : "border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300"
             }`}>
-            <span>{icon}</span> {label}
+            {label}
           </Link>
         ))}
         {user && (
