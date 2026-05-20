@@ -45,7 +45,11 @@ export default function DeviceCard({ device, isFavorited = false, onFavoriteChan
           {fav ? "♥" : "♡"}
         </button>
         {device.platform && (
-          <span className="absolute bottom-2 left-2 text-[10px] bg-white/80 text-gray-500 px-2 py-0.5 rounded-full uppercase tracking-wide font-medium">
+          <span className={`absolute bottom-2 left-2 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wide font-semibold ${
+            device.platform === "tiki"
+              ? "bg-orange-50 text-orange-500 border border-orange-200"
+              : "bg-red-50 text-red-500 border border-red-200"
+          }`}>
             {device.platform}
           </span>
         )}

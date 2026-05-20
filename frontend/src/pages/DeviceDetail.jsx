@@ -62,7 +62,14 @@ export default function DeviceDetail() {
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-xl font-bold text-gray-900 leading-snug">{device.name}</h1>
-              <p className="text-xs text-gray-400 mt-1 capitalize">{device.total_reviews_analyzed} reviews phân tích · {device.platform}</p>
+              <p className="text-xs text-gray-400 mt-1 flex items-center gap-1.5">
+                {device.total_reviews_analyzed} reviews phân tích ·
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${
+                  device.platform === "tiki"
+                    ? "bg-orange-50 text-orange-500 border border-orange-200"
+                    : "bg-red-50 text-red-500 border border-red-200"
+                }`}>{device.platform}</span>
+              </p>
             </div>
             <div className="text-right">
               <span className={`text-5xl font-extrabold ${scoreColor}`}>{(device.overall_score ?? 0).toFixed(1)}</span>
