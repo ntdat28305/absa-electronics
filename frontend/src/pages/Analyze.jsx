@@ -59,7 +59,7 @@ export default function Analyze() {
           disabled={phase === "crawling"}
           className="bg-blue-500 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 shadow-sm transition-colors"
         >
-          {phase === "crawling" ? "⏳ Đang phân tích..." : "▶ Phân tích"}
+          {phase === "crawling" ? "⏳ Đang phân tích..." : "Phân tích"}
         </button>
         {error && <p className="text-red-500 text-xs bg-red-50 px-3 py-2 rounded-lg mt-3">{error}</p>}
       </div>
