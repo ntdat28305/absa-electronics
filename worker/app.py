@@ -58,9 +58,9 @@ def crawl_search(data: SearchRequest, x_worker_key: str = Header(...)):
     check_key(x_worker_key)
     products = []
     if data.platform in ("shopee", "both"):
-        products += search_shopee(data.query, data.num_links)
+        products += search_shopee(data.query, data.num_links, data.reviews_per_link)
     if data.platform in ("tiki", "both"):
-        products += search_tiki(data.query, data.num_links)
+        products += search_tiki(data.query, data.num_links, data.reviews_per_link)
 
     devices = []
     for p in products[: data.num_links]:
