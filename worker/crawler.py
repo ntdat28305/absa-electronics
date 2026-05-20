@@ -1,3 +1,5 @@
+import os
+import random
 import requests
 import time
 
@@ -15,6 +17,17 @@ def get_headers(referer: str) -> dict:
     }
 
 
+def _get_shopee_proxy() -> dict | None:
+    raw = os.getenv("SHOPEE_PROXY_LIST", "")
+    if not raw:
+        return None
+    proxies = [p.strip() for p in raw.split(",") if p.strip()]
+    if not proxies:
+        return None
+    chosen = random.choice(proxies)
+    return {"http": chosen, "https": chosen}
+
+
 # ─── Shopee Search API ─────────────────────────────────────────────────────────
 
 def search_shopee(query: str, num_links: int, min_reviews: int = 10) -> list[dict]:
@@ -27,7 +40,10 @@ def search_shopee(query: str, num_links: int, min_reviews: int = 10) -> list[dic
         "page_type": "search",
     }
     try:
-        r = requests.get(url, params=params, headers=get_headers("https://shopee.vn/"), timeout=15)
+        r = requests.get(
+            url, params=params, headers=get_headers("https://shopee.vn/"),
+            proxies=_get_shopee_proxy(), timeout=15,
+        )
         r.raise_for_status()
         items = r.json().get("items", [])
     except Exception as e:
@@ -108,6 +124,7 @@ def scrape_shopee_reviews(shop_id: int, item_id: int, count: int) -> list[str]:
             r = requests.get(
                 url,
                 headers=get_headers(f"https://shopee.vn/product/{shop_id}/{item_id}"),
+                proxies=_get_shopee_proxy(),
                 timeout=10,
             )
             r.raise_for_status()

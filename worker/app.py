@@ -1,4 +1,5 @@
 import os
+import re
 from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 from typing import Optional
@@ -89,7 +90,9 @@ def crawl_search(data: SearchRequest, x_worker_key: str = Header(...)):
 def crawl_link(data: LinkRequest, x_worker_key: str = Header(...)):
     check_key(x_worker_key)
     platform = "shopee" if "shopee.vn" in data.url else "tiki"
-    parts = data.url.rstrip("/").split("/")
+    # strip query params before parsing
+    clean_url = data.url.split("?")[0].rstrip("/")
+    parts = clean_url.split("/")
 
     if platform == "shopee":
         # Shopee URL formats:
@@ -98,7 +101,6 @@ def crawl_link(data: LinkRequest, x_worker_key: str = Header(...)):
         shop_id, item_id = 0, 0
         last = parts[-1]
         if "." in last:
-            # slug format: split by "." and take last two numeric segments
             seg = last.split(".")
             try:
                 item_id = int(seg[-1])
@@ -111,13 +113,15 @@ def crawl_link(data: LinkRequest, x_worker_key: str = Header(...)):
         p = {"platform": "shopee", "shop_id": shop_id, "item_id": item_id}
         name = f"Sản phẩm Shopee #{item_id}"
     else:
+        # Tiki formats:
+        # /slug-name-p{id}.html  (common)
+        # /p{id}.html            (short)
         product_id = 0
         for part in reversed(parts):
-            if part.startswith("p") and part.endswith(".html"):
-                try:
-                    product_id = int(part[1:-5])
-                except ValueError:
-                    pass
+            m = re.search(r"-p(\d+)\.html$", part) or re.match(r"^p(\d+)\.html$", part)
+            if m:
+                product_id = int(m.group(1))
+                break
         p = {"platform": "tiki", "product_id": product_id, "seller_id": 1}
         name = f"Sản phẩm Tiki #{product_id}"
 
