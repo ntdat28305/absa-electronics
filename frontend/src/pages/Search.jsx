@@ -2,6 +2,7 @@ import { useState } from "react";
 import { crawlSearch } from "../api/crawl";
 import { getDevice } from "../api/devices";
 import DeviceCard from "../components/DeviceCard";
+import DeviceCardSkeleton from "../components/DeviceCardSkeleton";
 import WorkerStatus from "../components/WorkerStatus";
 
 export default function Search() {
@@ -95,10 +96,11 @@ export default function Search() {
       </div>
 
       {phase === "crawling" && (
-        <div className="text-center py-16 text-gray-400">
-          <div className="text-3xl mb-3">⏳</div>
-          <p className="text-sm">Đang cào và phân tích từ {platformLabel}...</p>
-          <p className="text-xs text-gray-300 mt-1">Có thể mất 1-3 phút</p>
+        <div>
+          <p className="text-xs text-gray-400 mb-3 text-center">Đang cào và phân tích từ {platformLabel}... (1-3 phút)</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {Array.from({ length: numLinks }).map((_, i) => <DeviceCardSkeleton key={i} />)}
+          </div>
         </div>
       )}
 

@@ -1,7 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { listDevices, searchDevices } from "../api/devices";
 import { getFavorites } from "../api/favorites";
 import DeviceCard from "../components/DeviceCard";
+import DeviceCardSkeleton from "../components/DeviceCardSkeleton";
 import { useAuth } from "../context/AuthContext";
 
 const PHONE_BRANDS = ["Apple", "Samsung", "Xiaomi", "Oppo", "Vivo"];
@@ -178,15 +180,37 @@ export default function Home() {
           </div>
 
           {searching ? (
-            <div className="text-center py-20 text-gray-400">Đang tìm kiếm...</div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, i) => <DeviceCardSkeleton key={i} />)}
+            </div>
           ) : loading && searchResults === null ? (
-            <div className="text-center py-20 text-gray-400">Đang tải...</div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, i) => <DeviceCardSkeleton key={i} />)}
+            </div>
           ) : error ? (
             <div className="text-center py-20 text-red-500">{error}</div>
           ) : displayDevices.length === 0 ? (
-            <div className="text-center py-20 text-gray-400">
-              {searchResults !== null ? "Không tìm thấy thiết bị nào" : "Chưa có thiết bị nào trong kho"}
-            </div>
+            searchResults !== null ? (
+              <div className="text-center py-20 text-gray-400">Không tìm thấy thiết bị nào</div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-24 text-center">
+                <div className="text-6xl mb-4">📭</div>
+                <h2 className="text-lg font-semibold text-gray-700 mb-1">Kho đang trống</h2>
+                <p className="text-sm text-gray-400 mb-6 max-w-xs">
+                  Chưa có sản phẩm nào. Tìm kiếm hoặc phân tích link để thêm sản phẩm mới vào kho.
+                </p>
+                <div className="flex gap-3">
+                  <Link to="/search"
+                    className="bg-blue-500 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 shadow-sm transition-colors">
+                    Tìm kiếm ngay
+                  </Link>
+                  <Link to="/analyze"
+                    className="bg-white border border-gray-200 text-gray-700 px-5 py-2 rounded-xl text-sm font-semibold hover:bg-gray-50 shadow-sm transition-colors">
+                    Phân tích link
+                  </Link>
+                </div>
+              </div>
+            )
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {displayDevices.map(d => (

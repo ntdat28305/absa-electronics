@@ -2,6 +2,7 @@ import { useState } from "react";
 import { crawlLink } from "../api/crawl";
 import { getDevice } from "../api/devices";
 import DeviceCard from "../components/DeviceCard";
+import DeviceCardSkeleton from "../components/DeviceCardSkeleton";
 import WorkerStatus from "../components/WorkerStatus";
 
 export default function Analyze() {
@@ -65,10 +66,9 @@ export default function Analyze() {
       </div>
 
       {phase === "crawling" && (
-        <div className="text-center py-16 text-gray-400">
-          <div className="text-3xl mb-3">⏳</div>
-          <p className="text-sm">Đang cào và phân tích...</p>
-          <p className="text-xs text-gray-300 mt-1">Có thể mất 1-2 phút</p>
+        <div>
+          <p className="text-xs text-gray-400 mb-3 text-center">Đang cào và phân tích... (1-2 phút)</p>
+          <DeviceCardSkeleton />
         </div>
       )}
 

@@ -24,7 +24,7 @@ export default function DeviceCard({ device, isFavorited = false, onFavoriteChan
     } finally { setLoading(false); }
   };
 
-  const scoreColor = device.overall_score >= 8 ? "text-emerald-600" : device.overall_score >= 6 ? "text-blue-500" : "text-red-500";
+  const scoreStyle = { color: `hsl(${Math.round((device.overall_score / 10) * 120)}, 80%, 40%)` };
 
   return (
     <Link to={`/devices/${device.id}`}
@@ -53,7 +53,7 @@ export default function DeviceCard({ device, isFavorited = false, onFavoriteChan
       <div className="p-3.5">
         <div className="font-semibold text-sm text-gray-900 truncate leading-snug">{device.name}</div>
         <div className="flex items-center justify-between mt-1.5">
-          <span className={`text-2xl font-bold ${scoreColor}`}>{device.overall_score.toFixed(1)}</span>
+          <span className="text-2xl font-bold" style={scoreStyle}>{device.overall_score.toFixed(1)}</span>
           <span className="text-xs text-gray-400">{device.total_reviews_analyzed} reviews</span>
         </div>
         {device.price && <div className="text-xs text-blue-500 font-medium mt-1">{device.price}</div>}
