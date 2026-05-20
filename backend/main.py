@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from database import Base, engine
 import models  # noqa: registers all models with Base
 from auth.router import router as auth_router
+from devices.router import router as devices_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -15,3 +16,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(auth_router)
+app.include_router(devices_router)
