@@ -16,7 +16,7 @@ export default function WorkerStatus() {
         : "text-red-600 bg-red-50 border-red-200"
     }`}>
       <span className={`w-1.5 h-1.5 rounded-full ${status.online ? "bg-emerald-500" : "bg-red-500"}`} />
-      Worker {status.online ? "online" : "offline"}
+      Colab {status.online ? "Online" : "Offline"}
     </div>
   );
 }
