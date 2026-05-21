@@ -18,6 +18,7 @@ env/
 *.pt
 *.bin
 phobert_tokenizer/
+worker/phobert_model/
 
 # Environment
 .env
