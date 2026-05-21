@@ -69,7 +69,7 @@ def search_shopee(query: str, num_links: int, min_reviews: int = 10) -> list[dic
         if min_reviews > 0 and d.get("cmt_count", 0) < min_reviews:
             continue
         price_raw = d.get("price", 0)
-        price = f"{int(price_raw / 100000) / 10:.1f}M đ" if price_raw else ""
+        price = f"{int(price_raw / 100000):,}đ" if price_raw else ""
         results.append({
             "name": d.get("name", ""),
             "image_url": f"https://cf.shopee.vn/file/{d.get('image', '')}",
@@ -180,7 +180,7 @@ def search_and_crawl_shopee(query: str, num_links: int, reviews_per_product: int
             if not shop_id or not item_id:
                 continue
             price_raw = d.get("price", 0)
-            price = f"{int(price_raw / 100000) / 10:.1f}M đ" if price_raw else ""
+            price = f"{int(price_raw / 100000):,}đ" if price_raw else ""
             candidates.append({
                 "name": d.get("name", ""),
                 "image_url": f"https://cf.shopee.vn/file/{d.get('image', '')}",
@@ -280,7 +280,7 @@ def get_shopee_product(shop_id: int, item_id: int) -> dict:
         image = d.get("image", "")
         image_url = f"https://cf.shopee.vn/file/{image}" if image else ""
         price_raw = d.get("price", 0) or d.get("price_min", 0)
-        price = f"{int(price_raw / 100000) / 10:.1f}M đ" if price_raw else ""
+        price = f"{int(price_raw / 100000):,}đ" if price_raw else ""
         return {"name": name, "image_url": image_url, "price": price}
     except Exception as e:
         print(f"[Shopee product detail error] {e}")
