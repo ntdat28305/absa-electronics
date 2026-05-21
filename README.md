@@ -5,7 +5,7 @@ Web app phân tích ABSA (Aspect-Based Sentiment Analysis) bình luận điện 
 ## Kiến trúc
 
 ```
-Frontend (React/Vite)  →  Railway
+Frontend (React/Vite)  →  Vercel
 Main API (FastAPI + PostgreSQL)  →  Railway
 Local Worker (FastAPI + ngrok)  →  máy cá nhân
 Models (PhoBERT ABSA)  →  chạy local trên worker
@@ -80,7 +80,7 @@ score = (mean_positive_pct * confidence + 50 * (1 - confidence)) / 10
 | Service | Platform | Ghi chú |
 |---|---|---|
 | Backend | Railway | PostgreSQL plugin đính kèm |
-| Frontend | Railway | Build arg: `VITE_API_URL` |
+| Frontend | Vercel | Env var: `VITE_API_URL` |
 | Worker | Local + ngrok | Cần chạy thủ công, re-register khi restart |
 
 ## Lưu ý

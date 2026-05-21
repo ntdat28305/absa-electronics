@@ -5,7 +5,7 @@ Web app phân tích cảm xúc bình luận thiết bị điện tử (điện t
 
 ## Kiến trúc 3-tier
 ```
-Frontend (React/Vite) → Railway
+Frontend (React/Vite) → Vercel
 Main API (FastAPI + PostgreSQL) → Railway
 Local Worker (crawl Shopee/Tiki + PhoBERT inference) → ngrok (máy cá nhân)
 ```
@@ -17,7 +17,7 @@ https://github.com/ntdat28305/absa-electronics
 
 ## Trạng thái hiện tại (2026-05-21)
 - [x] Backend FastAPI — HOÀN THÀNH (Railway)
-- [x] Frontend React — HOÀN THÀNH (Railway)
+- [x] Frontend React — HOÀN THÀNH (Vercel)
 - [x] Local Worker — HOÀN THÀNH (chạy local + ngrok)
 - [x] Tiki crawl — HOẠT ĐỘNG ổn định
 - [x] Shopee crawl — HOẠT ĐỘNG (undetected_chromedriver, cần login cookie)
