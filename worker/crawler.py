@@ -369,7 +369,7 @@ def scrape_shopee_reviews(shop_id: int, item_id: int, count: int, product_info: 
         if not _wait_if_captcha(driver):
             return reviews
 
-        # Extract product metadata from og: meta tags
+        # Extract product metadata from og: meta tags + product API
         if product_info is not None:
             try:
                 image_url = driver.execute_script(
@@ -382,6 +382,22 @@ def scrape_shopee_reviews(shop_id: int, item_id: int, count: int, product_info: 
                     product_info["image_url"] = image_url
                 if og_title:
                     product_info["name"] = og_title
+            except Exception:
+                pass
+            try:
+                product_detail = driver.execute_async_script(f"""
+                    const done = arguments[0];
+                    fetch('/api/v4/item/get?itemid={item_id}&shopid={shop_id}', {{
+                        credentials: 'include',
+                        headers: {{'x-requested-with': 'XMLHttpRequest'}}
+                    }})
+                    .then(r => r.json())
+                    .then(d => done(d))
+                    .catch(() => done(null));
+                """)
+                price_raw = ((product_detail or {}).get("data") or {}).get("price") or 0
+                if price_raw:
+                    product_info["price"] = f"{int(price_raw / 100000):,}đ"
             except Exception:
                 pass
 
