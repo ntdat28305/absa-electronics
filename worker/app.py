@@ -84,8 +84,11 @@ def crawl_search(data: SearchRequest, x_worker_key: str = Header(...)):
 
     # Tiki: dùng requests API như cũ
     if data.platform in ("tiki", "both"):
-        tiki_products = search_tiki(data.query, data.num_links)
-        for p in tiki_products[: data.num_links]:
+        tiki_candidates = search_tiki(data.query, 20)
+        tiki_found = 0
+        for p in tiki_candidates:
+            if tiki_found >= data.num_links:
+                break
             texts = crawl_product(p, data.reviews_per_link)
             if not texts:
                 print(f"[skip] no reviews for {p.get('name', '')}")
@@ -105,6 +108,7 @@ def crawl_search(data: SearchRequest, x_worker_key: str = Header(...)):
                 "overall_score": overall_score,
                 "reviews": [{"text": t, "aspects": a} for t, a in zip(texts, aspects_list)],
             })
+            tiki_found += 1
 
     return {"devices": devices}
 

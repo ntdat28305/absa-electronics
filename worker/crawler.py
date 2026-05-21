@@ -90,10 +90,27 @@ def _make_uc_driver():
     opts.add_argument("--no-sandbox")
     opts.add_argument("--window-size=1920,1080")
     opts.add_argument("--lang=vi-VN")
-    driver = uc.Chrome(options=opts, headless=False)
+    driver = uc.Chrome(options=opts, headless=False, version_main=148)
     driver.set_page_load_timeout(45)
     driver.set_script_timeout(30)
     return driver
+
+
+def _wait_if_captcha(driver, timeout: int = 120) -> bool:
+    """If Shopee shows any verify page, wait for user to handle it manually."""
+    if "/verify/" not in driver.current_url:
+        return True
+    print(f"[Shopee] verify page detected: {driver.current_url}")
+    print("[Shopee] Please handle it in the Chrome window (timeout: 2 min)...")
+    deadline = time.time() + timeout
+    while "/verify/" in driver.current_url:
+        if time.time() > deadline:
+            print("[Shopee] verify timeout — skipping")
+            return False
+        time.sleep(2)
+    print("[Shopee] verify passed, continuing...")
+    time.sleep(2)
+    return True
 
 
 def _inject_shopee_cookies(driver):
@@ -130,15 +147,20 @@ def search_and_crawl_shopee(query: str, num_links: int, reviews_per_product: int
         # Load homepage and inject cookies
         driver.get("https://shopee.vn")
         time.sleep(3)
+        if not _wait_if_captcha(driver):
+            return results
         _inject_shopee_cookies(driver)
         driver.get("https://shopee.vn")
         time.sleep(2)
+        if not _wait_if_captcha(driver):
+            return results
 
         # Search via browser fetch
         encoded = quote(query)
+        max_candidates = 20
         search_result = driver.execute_async_script(f"""
             const done = arguments[0];
-            fetch('/api/v4/search/search_items?by=relevancy&keyword={encoded}&limit={num_links * 3}&order=desc&page_type=search', {{
+            fetch('/api/v4/search/search_items?by=relevancy&keyword={encoded}&limit={max_candidates}&order=desc&page_type=search', {{
                 credentials: 'include',
                 headers: {{'x-requested-with': 'XMLHttpRequest'}}
             }})
@@ -150,7 +172,7 @@ def search_and_crawl_shopee(query: str, num_links: int, reviews_per_product: int
         items = (search_result or {}).get("items", [])
         print(f"[search_and_crawl_shopee] found {len(items)} raw items for '{query}'")
 
-        products = []
+        candidates = []
         for item in items:
             d = item.get("item_basic", {})
             shop_id = d.get("shopid")
@@ -159,7 +181,7 @@ def search_and_crawl_shopee(query: str, num_links: int, reviews_per_product: int
                 continue
             price_raw = d.get("price", 0)
             price = f"{int(price_raw / 100000) / 10:.1f}M đ" if price_raw else ""
-            products.append({
+            candidates.append({
                 "name": d.get("name", ""),
                 "image_url": f"https://cf.shopee.vn/file/{d.get('image', '')}",
                 "price": price,
@@ -169,15 +191,15 @@ def search_and_crawl_shopee(query: str, num_links: int, reviews_per_product: int
                 "item_id": item_id,
                 "reviews": [],
             })
-            if len(products) >= num_links:
-                break
 
-        # For each product, navigate and crawl reviews in the same browser session
-        for p in products:
+        # Crawl until we have num_links products with reviews, max 20 candidates
+        for p in candidates:
             shop_id = p["shop_id"]
             item_id = p["item_id"]
             driver.get(f"https://shopee.vn/product/{shop_id}/{item_id}")
             time.sleep(5)
+            if not _wait_if_captcha(driver):
+                continue
 
             # Update image and name from og tags
             try:
@@ -226,6 +248,8 @@ def search_and_crawl_shopee(query: str, num_links: int, reviews_per_product: int
             p["reviews"] = reviews
             if reviews:
                 results.append(p)
+                if len(results) >= num_links:
+                    break
             else:
                 print(f"[skip] no reviews for {p['name'][:40]}")
 
@@ -325,46 +349,25 @@ def search_tiki(query: str, num_links: int, min_reviews: int = 10) -> list[dict]
 # ─── Shopee Reviews (undetected_chromedriver) ─────────────────────────────────
 
 def scrape_shopee_reviews(shop_id: int, item_id: int, count: int, product_info: dict = None) -> list[str]:
-    try:
-        import undetected_chromedriver as uc
-    except ImportError:
-        print("[Shopee] undetected_chromedriver not installed. Run: pip install undetected-chromedriver")
-        return []
-
-    shopee_cookie = os.getenv("SHOPEE_COOKIE", "")
     reviews = []
     driver = None
 
     try:
-        opts = uc.ChromeOptions()
-        opts.add_argument("--no-sandbox")
-        opts.add_argument("--window-size=1920,1080")
-        opts.add_argument("--lang=vi-VN")
-
-        driver = uc.Chrome(options=opts, headless=False)
-        driver.set_page_load_timeout(45)
-        driver.set_script_timeout(30)
+        driver = _make_uc_driver()
 
         # Load shopee.vn first to set domain for cookies
         driver.get("https://shopee.vn")
         time.sleep(3)
-
-        # Inject cookies
-        if shopee_cookie:
-            for part in shopee_cookie.split(";"):
-                name, _, value = part.strip().partition("=")
-                name = name.strip()
-                if not name:
-                    continue
-                try:
-                    driver.add_cookie({"name": name, "value": value.strip(),
-                                       "domain": ".shopee.vn", "path": "/"})
-                except Exception:
-                    pass
+        if not _wait_if_captcha(driver):
+            return reviews
+        _inject_shopee_cookies(driver)
 
         # Navigate to product page with cookies active
         driver.get(f"https://shopee.vn/product/{shop_id}/{item_id}")
         time.sleep(5)
+        print(f"[Shopee] current URL after product nav: {driver.current_url}")
+        if not _wait_if_captcha(driver):
+            return reviews
 
         # Extract product metadata from og: meta tags
         if product_info is not None:

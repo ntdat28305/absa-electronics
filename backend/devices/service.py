@@ -31,11 +31,18 @@ def search_devices(db: Session, q: str):
 def save_batch(db: Session, devices: list[DeviceBatchItem], source: SourceEnum):
     saved = []
     for d in devices:
-        # skip duplicate product_url
-        if d.product_url and db.query(Device).filter(Device.product_url == d.product_url).first():
-            continue
         aspect_scores = compute_aspect_scores([r.get("aspects", []) for r in d.reviews])
         overall = compute_overall_score(aspect_scores, len(d.reviews))
+        if d.product_url:
+            existing = db.query(Device).filter(Device.product_url == d.product_url).first()
+            if existing:
+                existing.overall_score = overall
+                existing.total_reviews_analyzed = len(d.reviews)
+                existing.aspect_scores = aspect_scores
+                existing.image_url = d.image_url or existing.image_url
+                existing.price = d.price or existing.price
+                saved.append(existing)
+                continue
         device = Device(
             name=d.name, category=d.category, brand=d.brand,
             image_url=d.image_url, platform=d.platform,
