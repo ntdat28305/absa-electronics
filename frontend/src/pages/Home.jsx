@@ -55,7 +55,7 @@ export default function Home() {
     let cancelled = false;
     setLoading(true);
     setError("");
-    listDevices({ category: category || undefined, brand: brand || undefined, sort, page })
+    listDevices({ category: category || undefined, brand: brand || undefined, sort, page, source: "preset" })
       .then(r => { if (!cancelled) { setDevices(r.data.items); setTotal(r.data.total); } })
       .catch(() => { if (!cancelled) setError("Không thể tải danh sách thiết bị."); })
       .finally(() => { if (!cancelled) setLoading(false); });

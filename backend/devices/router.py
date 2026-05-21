@@ -10,8 +10,9 @@ router = APIRouter(prefix="/devices", tags=["devices"])
 
 @router.get("", response_model=dict)
 def get_devices(category: Optional[str] = None, brand: Optional[str] = None,
-                sort: str = "score", page: int = 1, db: Session = Depends(get_db)):
-    items, total = list_devices(db, category, brand, sort, page)
+                sort: str = "score", page: int = 1, source: Optional[str] = None,
+                db: Session = Depends(get_db)):
+    items, total = list_devices(db, category, brand, sort, page, source=source)
     return {"total": total, "page": page, "items": [DeviceOut.model_validate(d) for d in items]}
 
 @router.get("/search", response_model=list[DeviceOut])
